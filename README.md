@@ -12,3 +12,7 @@ The trainging data is from flicker.com.
 You can obtain the training data according to description of [CompressionData](https://github.com/liujiaheng/CompressionData)
 
 The training details is similar to our another repo [compression](https://github.com/liujiaheng/compression)
+
+## Installing necessary packages
+
+See packages.txt
