@@ -1,7 +1,7 @@
 #!/Library/Frameworks/Python.framework/Versions/3.5/bin/python3.5
 import torch.nn as nn
 import torch
-from GDN import GDN
+from .GDN import GDN
 import math
 
 class Analysis_net_17(nn.Module):
