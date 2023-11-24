@@ -4,7 +4,7 @@
 /.idea/
 .history
 .vscode
-checkpoints
+# checkpoints
 events
 examples
 # Byte-compiled / optimized / DLL files
