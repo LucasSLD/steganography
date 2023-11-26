@@ -115,5 +115,3 @@ venv.bak/
 
 # Apple's .DS_Store
 *.DS_Store
-
-*.ipynb
