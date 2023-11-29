@@ -13,14 +13,19 @@ def plot_image(img_numpy_array, title : str):
     plt.imshow(img_numpy_array)
     plt.show()
 
-def test(path_model : str, img_indexes : list[int]):
+def test(path_model : str, img_indexes : list[int], stega=False, p=.0):
     with torch.no_grad():
-        model = ImageCompressor()
-        load_model(model,path_model)
-        net = model.cuda()
+        if stega:
+            model_stega = ImageCompressorSteganography(p)
+            load_model(model_stega,path_model)
+            net_stega = model_stega.cuda()
+            net_stega.eval()
+        model_cover = ImageCompressor()
+        load_model(model_cover,path_model)
+        net_cover = model_cover.cuda()
         test_dataset = TestKodakDataset(data_dir='../data1/liujiaheng/data/kodak')
         test_loader = DataLoader(dataset=test_dataset, shuffle=True, batch_size=1, pin_memory=True, num_workers=1)
-        net.eval()
+        net_cover.eval()
         sumBpp = 0
         sumPsnr = 0
         sumMsssim = 0
@@ -30,23 +35,27 @@ def test(path_model : str, img_indexes : list[int]):
         for batch_idx, input in enumerate(test_loader):
             if batch_idx in img_indexes:
                 input = input.cuda()
-                clipped_recon_image, mse_loss, bpp = net(input)
-
-                mse_loss = torch.mean((clipped_recon_image - input).pow(2))
+                cover_image, mse_loss, bpp = net_cover(input)
+                
+                mse_loss = torch.mean((cover_image - input).pow(2))
                 mse_loss, bpp = torch.mean(mse_loss), torch.mean(bpp)
                 psnr = 10 * (torch.log(1. / mse_loss) / np.log(10))
                 sumBpp += bpp
                 sumPsnr += psnr
-                msssim = ms_ssim(clipped_recon_image.cpu().detach(), input.cpu(), data_range=1.0, size_average=True)
+                msssim = ms_ssim(cover_image.cpu().detach(), input.cpu(), data_range=1.0, size_average=True)
                 msssimDB = -10 * (torch.log(1-msssim) / np.log(10))
                 sumMsssimDB += msssimDB
                 sumMsssim += msssim
                 cnt += 1
 
-                img_ori_np = input[0].permute(1,2,0).cpu().numpy()
-                img_reco_np = clipped_recon_image[0].permute(1,2,0).cpu().numpy()
-                plot_image(img_ori_np,"original image")
-                plot_image(img_reco_np,"reconstructed image")
+                precover_img_np = input[0].permute(1,2,0).cpu().numpy()
+                cover_img_np = cover_image[0].permute(1,2,0).cpu().numpy()
+                plot_image(precover_img_np,"precover image")
+                plot_image(cover_img_np,"cover image")
+                if stega:
+                    stega_image, _, _ = net_stega(input)
+                    stega_img_np = stega_image[0].permute(1,2,0).cpu().numpy()
+                    plot_image(stega_img_np,"stega image")
         
         sumBpp /= cnt
         sumPsnr /= cnt
