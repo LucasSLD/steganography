@@ -77,3 +77,41 @@ class ImageCompressor(nn.Module):
         bpp_feature = total_bits_feature / (batch_size * im_shape[2] * im_shape[3])
 
         return clipped_recon_image, mse_loss, bpp_feature
+
+
+class ImageCompressorSteganography(nn.Module):
+    def __init__(self, p=0.0, out_channel_N=128):
+        super(ImageCompressorSteganography, self).__init__()
+        self.Encoder = Analysis_net_17(out_channel_N=out_channel_N)
+        self.Decoder = Synthesis_net_17(out_channel_N=out_channel_N)
+        self.bitEstimator = BitEstimator(channel=out_channel_N)
+        self.out_channel_N = out_channel_N
+        self.p = p
+
+    def forward(self, input_image):
+        quant_noise_feature = torch.zeros(input_image.size(0), self.out_channel_N, input_image.size(2) // 16, input_image.size(3) // 16).cuda()
+        quant_noise_feature = torch.nn.init.uniform_(torch.zeros_like(quant_noise_feature), -0.5, 0.5)
+        feature = self.Encoder(input_image)
+        batch_size = feature.size()[0]
+
+        """probabilities = [self.p, 1 - 2*self.p, self.p]
+        values = [-1,0,1]
+        for""" 
+
+        compressed_feature_renorm = torch.round(feature)
+        recon_image = self.Decoder(compressed_feature_renorm)
+        # recon_image = prediction + recon_res
+        clipped_recon_image = recon_image.clamp(0., 1.)
+        # distortion
+        mse_loss = torch.mean((recon_image - input_image).pow(2))
+
+        def iclr18_estimate_bits_z(z):
+            prob = self.bitEstimator(z + 0.5) - self.bitEstimator(z - 0.5)
+            total_bits = torch.sum(torch.clamp(-1.0 * torch.log(prob + 1e-10) / math.log(2.0), 0, 50))
+            return total_bits, prob
+
+        total_bits_feature, _ = iclr18_estimate_bits_z(compressed_feature_renorm)
+        im_shape = input_image.size()
+        bpp_feature = total_bits_feature / (batch_size * im_shape[2] * im_shape[3])
+
+        return clipped_recon_image, mse_loss, bpp_feature
