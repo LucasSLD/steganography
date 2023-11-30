@@ -93,12 +93,16 @@ class ImageCompressorSteganography(nn.Module):
         quant_noise_feature = torch.nn.init.uniform_(torch.zeros_like(quant_noise_feature), -0.5, 0.5)
         feature = self.Encoder(input_image)
         batch_size = feature.size()[0]
-
-        """probabilities = [self.p, 1 - 2*self.p, self.p]
-        values = [-1,0,1]
-        for""" 
-
         compressed_feature_renorm = torch.round(feature)
+        
+        probabilities = [self.p, 1 - 2*self.p, self.p]
+        values = [-1,0,1]
+
+        for i in range(len(compressed_feature_renorm[0])):
+            for j in range(len(compressed_feature_renorm[0,i])):
+                for k in range(len(compressed_feature_renorm[0,i,j])):
+                    compressed_feature_renorm[0,i,j,k] += np.random.choice(values,p=probabilities)
+
         recon_image = self.Decoder(compressed_feature_renorm)
         # recon_image = prediction + recon_res
         clipped_recon_image = recon_image.clamp(0., 1.)
