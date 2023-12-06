@@ -94,15 +94,13 @@ class ImageCompressorSteganography(nn.Module):
         feature = self.Encoder(input_image)
         batch_size = feature.size()[0]
         compressed_feature_renorm = torch.round(feature)
+
+        probabilities = torch.Tensor([self.p, 1 - 2*self.p, self.p]) # probability 2*p of modifying the value of a feature
+        shape = compressed_feature_renorm.shape[1:]
+        values = torch.multinomial(probabilities,shape[0]*shape[1]*shape[2],replacement=True) - 1
+        values = values.reshape((shape[0],shape[1],shape[2])).cuda()
+        compressed_feature_renorm[0].add_(values)
         
-        probabilities = [self.p, 1 - 2*self.p, self.p]
-        values = [-1,0,1]
-
-        for i in range(len(compressed_feature_renorm[0])):
-            for j in range(len(compressed_feature_renorm[0,i])):
-                for k in range(len(compressed_feature_renorm[0,i,j])):
-                    compressed_feature_renorm[0,i,j,k] += np.random.choice(values,p=probabilities)
-
         recon_image = self.Decoder(compressed_feature_renorm)
         # recon_image = prediction + recon_res
         clipped_recon_image = recon_image.clamp(0., 1.)
