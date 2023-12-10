@@ -15,21 +15,16 @@ def plot_image(img_numpy_array, title : str):
 
 def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.0):
     with torch.no_grad():
+        model = ImageCompressorSteganography(p)
+        load_model(model,path_model)
+        net = model.cuda()
+        net.eval()
         if stega:
-            model_stega = ImageCompressorSteganography(p)
-            load_model(model_stega,path_model)
-            net_stega = model_stega.cuda()
-            net_stega.eval()
-
             sumBpp_stega = 0
             sumPsnr_stega_cover = 0
 
-        model_cover = ImageCompressor()
-        load_model(model_cover,path_model)
-        net_cover = model_cover.cuda()
         test_dataset = TestKodakDataset(data_dir='../data1/liujiaheng/data/kodak')
         test_loader = DataLoader(dataset=test_dataset, shuffle=False, batch_size=1, pin_memory=True, num_workers=1)
-        net_cover.eval()
         sumBpp = 0
         sumPsnr = 0
         sumMsssim = 0
@@ -39,7 +34,7 @@ def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.
         for batch_idx, input in enumerate(test_loader):
             if batch_idx in img_indexes:
                 input = input.cuda()
-                cover_image, mse_loss, bpp = net_cover(input)
+                cover_image, mse_loss, bpp = net(input,stega=False)
                 
                 mse_loss = torch.mean((cover_image - input).pow(2))
                 mse_loss, bpp = torch.mean(mse_loss), torch.mean(bpp)
@@ -59,7 +54,7 @@ def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.
                     plot_image(cover_img_np,"cover image")
 
                 if stega:
-                    stega_image, _, bpp_stega = net_stega(input)
+                    stega_image, _, bpp_stega = net(input,stega=True)
 
                     mse_loss_stega_cover = torch.mean((stega_image - cover_image).pow(2))
                     psnr_stega_cover = 10 * (torch.log(1. / mse_loss_stega_cover) / np.log(10))

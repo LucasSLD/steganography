@@ -88,18 +88,19 @@ class ImageCompressorSteganography(nn.Module):
         self.out_channel_N = out_channel_N
         self.p = p
 
-    def forward(self, input_image):
+    def forward(self, input_image, stega=False):
         quant_noise_feature = torch.zeros(input_image.size(0), self.out_channel_N, input_image.size(2) // 16, input_image.size(3) // 16).cuda()
         quant_noise_feature = torch.nn.init.uniform_(torch.zeros_like(quant_noise_feature), -0.5, 0.5)
         feature = self.Encoder(input_image)
         batch_size = feature.size()[0]
         compressed_feature_renorm = torch.round(feature)
 
-        probabilities = torch.Tensor([self.p, 1 - 2*self.p, self.p]) # probability 2*p of modifying the value of a feature
-        shape = compressed_feature_renorm.shape[1:]
-        values = torch.multinomial(probabilities,shape[0]*shape[1]*shape[2],replacement=True) - 1
-        values = values.reshape((shape[0],shape[1],shape[2])).cuda()
-        compressed_feature_renorm[0].add_(values)
+        if stega:
+            probabilities = torch.Tensor([self.p, 1 - 2*self.p, self.p]) # probability 2*p of modifying the value of a feature
+            shape = compressed_feature_renorm.shape[1:]
+            values = torch.multinomial(probabilities,shape[0]*shape[1]*shape[2],replacement=True) - 1
+            values = values.reshape((shape[0],shape[1],shape[2])).cuda()
+            compressed_feature_renorm[0].add_(values)
         
         recon_image = self.Decoder(compressed_feature_renorm)
         # recon_image = prediction + recon_res
