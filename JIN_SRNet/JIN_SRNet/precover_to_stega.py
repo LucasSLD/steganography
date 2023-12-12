@@ -42,4 +42,12 @@ def precover_to_cover(
             precover_t = to_tensor(precover)
             cover_t, mse_loss, bpp = net(precover_t)
             cover = to_pil(cover_t[0])
-            
+            cover.save(cover_folder_path + file_name)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n","--name",required=True,help="Path to the folder of precover images")
+    parser.add_argument("-o","--output",required=True,help="Path to the folder of cover images")
+    parser.add_argument("-b","--begin",default=1, type=int,help="Number of first image to convert")
