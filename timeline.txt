@@ -14,3 +14,7 @@
     - entrainement du modèle
 
 1er décembre - 7 décembre: optimisation de la génération d'image stega (utilisation de fonction pytorch pour utiliser le GPU)
+
+7 décembre - 14 décembre:
+    - génération de cover à partir de BossBase dataset
+    - génération de stega à partir de BossBase dataset
