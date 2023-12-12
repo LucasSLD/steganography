@@ -14,8 +14,8 @@ steganalyse avec bossbase dataset
 
 Jan Butora
 
-10 000 images -> en utiliser 2000-3000 image en test/
+10 000 images -> en utiliser 2000-3000 images en test/
 
-meeting : Jeudi 14 décembre 16h
+meeting : Jeudi 14 décembre 16h10
 
 Computing one stega image is too slow!!! -> I should try to use GPU for this computations. Maybe I should create beforehand a 3D tensor with values in {-1,0,1} using the probabilities and then apply the sum directly with pytorch function to work only on GPU and accelerate computations.
