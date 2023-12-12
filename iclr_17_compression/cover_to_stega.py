@@ -1,6 +1,7 @@
+from model import ImageCompressor
+from torchvision import transforms
 from PIL import Image
 import numpy as np
-from model import ImageCompressorSteganography
 import torch
 import os
 
@@ -17,9 +18,28 @@ def read_pgm(file_name):
     return img
 
 
-def precover_to_cover(precover_batch_path : str, model : ImageCompressorSteganograĥy, file_id : int):
-    # files = os.
+def precover_to_cover(
+    precover_folder_path : str, 
+    cover_folder_path : str, 
+    model : ImageCompressor, 
+    file_id_start : int, 
+    file_id_stop : int):
+    
+    files = os.listdir(precover_folder_path)
+    assert file_id_start-1 < len(files)
+    assert file_id_stop-1 < len(files)
+    assert file_id_stop >= file_id_start
+    
+    files_to_convert = files[file_id_start-1:file_id_stop]
+    to_tensor = transforms.ToTensor()
+    to_pil    = transforms.ToPILImage()
     with torch.no_grad():
         net = model.cuda()
         net.eval()
-        
+
+        for file_name in files_to_convert:
+            precover = read_pgm(precover_folder_path + file_name)
+            precover_t = to_tensor(precover)
+            cover_t, mse_loss, bpp = net(precover_t)
+            cover = to_pil(cover_t[0])
+            
