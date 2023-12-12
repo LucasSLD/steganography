@@ -2,7 +2,7 @@
 *.zip
 /data1
 /flicker_2W_images
-/JIN_SRNet/BossBase*/
+/JIN_SRNet/BossBase*
 *.pdf
 /screen_shot
 /results
