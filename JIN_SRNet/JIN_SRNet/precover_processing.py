@@ -6,7 +6,8 @@ from PIL import Image
 import numpy as np
 import torch
 import os
-
+from math import log
+from tqdm import tqdm
 
 def read_pgm(file_name):
     with open(file_name, 'rb') as f:
@@ -54,15 +55,17 @@ def precover_to_cover(
         net.eval()
 
         stega  = p > .0
-        for file in files_to_convert:
+        for file in tqdm(files_to_convert):
             precover = read_pgm(precover_folder_path + "/" + file)
             precover_t = to_tensor(precover).repeat(1,3,1,1).cuda()
             cover_t, mse_loss, bpp = net(precover_t,stega=stega)
             cover = to_pil(cover_t[0])
             file_name, _ = os.path.splitext(file)
             cover.save(cover_folder_path + "/" + file_name + ".jpg")
-            print("hey!")
 
+
+def H(p):
+    return -2*p*log(p,2) - (1-2*p)*log(1-2*p,2)
 
 if __name__ == "__main__":
     import argparse
@@ -77,5 +80,8 @@ if __name__ == "__main__":
     parser.add_argument("-p","--probability",type=float,default=.0,help="half insertion rate")
 
     args = parser.parse_args()
-
+    if args.probability > 0.:
+        info = f"p = {args.probability}\nH3(p) = {H(args.probability)}"
+        with open(args.output + "/" + "_info.txt","w") as f:
+            f.write(info)
     precover_to_cover(args.name, args.output, args.model, args.probability, args.begin, args.end)
