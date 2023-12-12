@@ -1,0 +1,21 @@
+Entropie ternaire -> taille en bit du message que l'on peut transmettre
+Faire varier la probabilité p de changer d'état
+Tracer courbe PSNR = f(H3(p)) où H3(p) est l'entropie ternaire.
+Quand un feature à la valeur v. La proba de passer à v+1 est p et celle de passer à v-1
+est p. La proba de rester sur v est 1-2p. Tracer les courbes pour des valeurs de
+H3(p) allant de 0 à 1.7 (p allant de 0 à 1/3).
+Faire une courbe PSNR entre cover et stega et une autre entre precover (img originale)
+et stega. Directement modifier la valeur des feature (ça revient à modifier le bit de
+poids faible).
+
+différence entre cover et steganography
+steganalyse avec bossbase dataset
+-> use GPU JIN_SRNET
+
+Jan Butora
+
+10 000 images -> en utiliser 2000-3000 image en test/
+
+meeting : Jeudi 14 décembre 16h
+
+Computing one stega image is too slow!!! -> I should try to use GPU for this computations. Maybe I should create beforehand a 3D tensor with values in {-1,0,1} using the probabilities and then apply the sum directly with pytorch function to work only on GPU and accelerate computations.

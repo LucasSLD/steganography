@@ -1,0 +1,16 @@
+29 septembre : 
+    - premier meeting avec Patrick Bas, discussion du sujet
+
+10 octobre :
+    - premier meeting de travail -> discussion steganography + article à lire (End To End Optimized Image Compression)
+
+10 novembre :
+    - bilan sur l'article
+
+10 novembre - 24 novembre : 
+    - prise en main du code github en lien avec l'article
+
+24 novembre - 1er decembre : 
+    - entrainement du modèle
+
+1er décembre - 7 décembre: optimisation de la génération d'image stega (utilisation de fonction pytorch pour utiliser le GPU)

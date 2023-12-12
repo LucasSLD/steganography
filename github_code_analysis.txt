@@ -1,0 +1,6 @@
+model.py : the full neural network with uniform quantification at line 55
+analysis_17.py : the analysis transform mentioned in p.2 of End to End Optimized Image Compression (ETEOIC).
+synthesis_17.py : synthesis transform p.2 of ETEOIC
+bitEstimator.py : I don't know what this bit estimator is for and to what part of the paper it is related to... -> according to chatGPT it is used to estimate the number of bits required to represent the compressed features.
+		  Why do you need a probabilistic approach to estimate the number of bits needed to represent features ? Knowing the number of bits used to represent compressed features gives an idea of the efficiency of the
+		  compression. 

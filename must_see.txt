@@ -1,0 +1,3 @@
+-> arithmetic coding and other type of coding
+-> autoencoders
+-> quantification techniques

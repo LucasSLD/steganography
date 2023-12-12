@@ -1,0 +1,7 @@
+Dataset used with ETEOIC code :
+@article{liu2020unified,
+  title={A Unified End-to-End Framework for Efficient Deep Image Compression},
+  author={Liu, Jiaheng and Lu, Guo and Hu, Zhihao and Xu, Dong},
+  journal={arXiv preprint arXiv:2002.03370},
+  year={2020}
+}

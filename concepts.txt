@@ -1,0 +1,1 @@
+bpp : bit par pixel -> somme du nb de bit nécessaires par pixel pour encoder l'information de couleur du pixel. Ex : image RVB non compressée avec bit depth de 8 bits aura un bpp de 24.
