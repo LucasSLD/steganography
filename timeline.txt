@@ -18,3 +18,4 @@
 7 décembre - 14 décembre:
     - génération de cover à partir de BossBase dataset
     - génération de stega à partir de BossBase dataset
+    - Visualisation de la différence cover/stega (pgm_read.ipynb)
