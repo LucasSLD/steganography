@@ -7,11 +7,16 @@ import numpy as np
 
 transform = transforms.ToPILImage()
 
-def plot_image(img_numpy_array, title : str):
-    plt.title(title)
+def plot_image(img_numpy_array, title : str = None):
+    if title is not None: plt.title(title)
     plt.tick_params(left = False, right = False , labelleft = False , labelbottom = False, bottom = False) 
     plt.imshow(img_numpy_array)
     plt.show()
+
+def plot_tensor(tensor, title : str = None):
+    assert tensor.shape[0] == 1 # we plot 4D tensors which in reality represents 3D images (I don't know what is the purpose of the first axis)
+    array = tensor[0].permute(1,2,0).cpu().numpy()
+    plot_image(array, title)
 
 def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.0):
     with torch.no_grad():
