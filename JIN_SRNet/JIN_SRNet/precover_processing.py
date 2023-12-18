@@ -9,6 +9,10 @@ import os
 from math import log
 from tqdm import tqdm
 
+""" 
+This script can be used to create cover images from jpg precover or it can be used
+"""
+
 def read_pgm(file_name):
     with open(file_name, 'rb') as f:
         # Skip header
@@ -24,16 +28,16 @@ def read_pgm(file_name):
 
 def precover_to_cover(
     precover_folder_path : str, 
-    cover_folder_path : str,
+    output_path : str,
     model_path : str, 
     p : float = .0, 
     file_id_start : int = 1, 
     file_id_stop : int = -1):
     """
-    Generates cover images using ImageCompressor model on a range of precover images
+    Generates cover or stego images using ImageCompressor model on a range of precover images
     Args:
         precover_folder_path (str): path to the precovers' folder
-        cover_folder_path (str): path where to store cover images
+        output_path (str): path where to store cover/stego images
         p (float): insertion rate = 2*p (if steganography is active)
         model_path (str): path to the parameters of the ImageCompressor model
         file_id_start (int, optional): Lower bound of the range of images.
@@ -58,13 +62,21 @@ def precover_to_cover(
         for file in tqdm(files_to_convert):
             precover = read_pgm(precover_folder_path + "/" + file)
             precover_t = to_tensor(precover).repeat(1,3,1,1).cuda()
-            cover_t, mse_loss, bpp = net(precover_t,stega=stega)
-            cover = to_pil(cover_t[0])
             file_name, _ = os.path.splitext(file)
-            cover.save(cover_folder_path + "/" + file_name + ".jpg")
+            compressed_img_t, mse_loss, bpp = net(precover_t,stega=stega)
+            
+            torch.save(compressed_img_t, output_path + "/" + file_name + ".pt")
 
 
-def H(p):
+def H(p: float) -> float:
+    """
+    Ternary entropy
+    Args:
+        p (float): half insertion rate
+
+    Returns:
+        float: ternary entropy for given p
+    """
     return -2*p*log(p,2) - (1-2*p)*log(1-2*p,2)
 
 if __name__ == "__main__":

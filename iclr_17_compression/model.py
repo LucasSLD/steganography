@@ -101,7 +101,7 @@ class ImageCompressorSteganography(nn.Module):
             values = torch.multinomial(probabilities,shape[0]*shape[1]*shape[2],replacement=True) - 1
             values = values.reshape((shape[0],shape[1],shape[2])).cuda()
             compressed_feature_renorm[0].add_(values)
-        
+
         recon_image = self.Decoder(compressed_feature_renorm)
         # recon_image = prediction + recon_res
         clipped_recon_image = recon_image.clamp(0., 1.)
