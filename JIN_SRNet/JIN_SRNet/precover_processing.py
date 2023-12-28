@@ -10,7 +10,10 @@ from math import log
 from tqdm import tqdm
 
 """ 
-This script can be used to create cover images from jpg precover or it can be used
+This script can be used to create cover or stego images from jpg precover or it can be used
+
+Ex :
+python precover_processing.py -n ../BossBase-1.01-precover -o ../stego_04bits -m ../../iclr_17_compression/checkpoints/baseline/iter_1590000.pth.tar -p 0.03333333333333333
 """
 
 def read_pgm(file_name):
