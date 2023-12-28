@@ -17,8 +17,13 @@
 
 7 décembre - 14 décembre:
     - génération de cover à partir de BossBase dataset
-    - génération de stega à partir de BossBase dataset
-    - Visualisation de la différence cover/stega (pgm_read.ipynb)
+    - génération de stego à partir de BossBase dataset
+    - Visualisation de la différence cover/stego (pgm_read.ipynb)
 
 14 décembre - 19 décembre:
     - tentative de sauvegarder les compressed features au lieu des compressed images (sinon les jpg rajoute de la compression en plus, ce qui est indésirable)
+    - sauvegarde des images sous forme de tenseur
+    - regénération des folder cover et stego
+
+Training : have 25% error with naive insertion, 20-50 epochs (install tensor board)
+

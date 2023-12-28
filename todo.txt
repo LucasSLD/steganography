@@ -21,3 +21,11 @@ meeting : Jeudi 14 décembre 16h10
 Computing one stega image is too slow!!! -> I should try to use GPU for this computations. Maybe I should create beforehand a 3D tensor with values in {-1,0,1} using the probabilities and then apply the sum directly with pytorch function to work only on GPU and accelerate computations.
 
 meeting : mardi 19 à 14h, look for CNN training with pytorch
+
+Fine-tune SRNet to work with stego generated using the image compressor model.
+
+use training script
+
+train on stego 1.5bit so it can easily find stego/cover difference (should be around 100% accuracy on validation set)
+
+thursday 11  january -> 4pm next meeting should have the training 
