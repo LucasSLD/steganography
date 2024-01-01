@@ -7,7 +7,7 @@ import numpy as np
 
 transform = transforms.ToPILImage()
 
-def plot_image(img_numpy_array, title : str = None):
+def plot_np_array(img_numpy_array, title : str = None):
     if title is not None: plt.title(title)
     plt.tick_params(left = False, right = False , labelleft = False , labelbottom = False, bottom = False) 
     plt.imshow(img_numpy_array)
@@ -21,7 +21,7 @@ def plot_tensor(tensor, title : str = None):
     else:
         print("ShapeError: the input array should be 3D or 4D")
         return
-    plot_image(array, title)
+    plot_np_array(array, title)
 
 def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.0):
     with torch.no_grad():
@@ -60,8 +60,8 @@ def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.
                 if plot:
                     precover_img_np = input[0].permute(1,2,0).cpu().numpy()
                     cover_img_np = cover_image[0].permute(1,2,0).cpu().numpy()
-                    plot_image(precover_img_np,"precover image")
-                    plot_image(cover_img_np,"cover image")
+                    plot_np_array(precover_img_np,"precover image")
+                    plot_np_array(cover_img_np,"cover image")
 
                 if stega:
                     stega_image, _, bpp_stega = net(input,stega=True)
@@ -75,7 +75,7 @@ def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.
 
                     if plot:
                         stega_img_np = stega_image[0].permute(1,2,0).cpu().numpy()
-                        plot_image(stega_img_np,"stega image")
+                        plot_np_array(stega_img_np,"stega image")
         
         sumBpp /= cnt
         sumPsnr /= cnt
