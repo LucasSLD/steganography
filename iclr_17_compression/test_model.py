@@ -75,7 +75,7 @@ def test(path_model : str, img_indexes : list[int], plot=False, stega=False, p=.
 
                     if plot:
                         stega_img_np = stega_image[0].permute(1,2,0).cpu().numpy()
-                        plot_np_array(stega_img_np,"stega image")
+                        plot_np_array(stega_img_np,"stego image")
         
         sumBpp /= cnt
         sumPsnr /= cnt
