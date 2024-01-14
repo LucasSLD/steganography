@@ -29,3 +29,6 @@ use training script
 train on stego 1.5bit so it can easily find stego/cover difference (should be around 100% accuracy on validation set)
 
 thursday 11  january -> 4pm next meeting should have the training 
+
+thursday 18: 4pm meeting
+Lundi 29 janvier: 3pm45 meeting
