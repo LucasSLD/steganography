@@ -1,7 +1,7 @@
 import torch
-from timm.models.layers import Swish
-from timm.models.layers.adaptive_avgmax_pool import SelectAdaptivePool2d
-from timm.models.layers import create_conv2d, create_pool2d
+from timm.layers import Swish
+from timm.layers.adaptive_avgmax_pool import SelectAdaptivePool2d
+from timm.layers import create_conv2d, create_pool2d
 import timm
 from torch import nn
 from timm.models.layers import Swish as SwishMe

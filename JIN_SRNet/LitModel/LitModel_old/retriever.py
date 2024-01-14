@@ -1,10 +1,10 @@
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
-import jpegio as jio
+# import jpegio as jio
 import pandas as pd
 import numpy as np
 import pickle
-import cv2
+# import cv2
 import albumentations as A
 import os
 from albumentations.pytorch.transforms import ToTensorV2
@@ -12,8 +12,8 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 import sys
 sys.path.insert(1,'./')
-from tools.jpeg_utils import *
-import h5py
+# from tools.jpeg_utils import *
+# import h5py
 
 
 def get_train_transforms(size=512):
@@ -108,7 +108,52 @@ class TrainRetriever(Dataset):
 
     def get_labels(self):
         return list(self.labels)
+
+class TrainRetriever_pt(Dataset):
+    """
+    Represents a dataset which contains information about images saved as tensors of shape (1, 3, height, width).
+    """
+
+    def __init__(self, data_path, kinds, image_names, labels, decoder='NR', transforms=None, return_name=False):
+        super().__init__()
+        self.data_path = data_path
+        self.kinds = kinds
+        self.image_names = image_names
+        self.return_name = return_name
+        self.labels = labels
+        self.transforms = transforms
+        self.decoder = decoder
+        self.classes = len(np.unique(self.kinds))
+
+        if not self.data_path.endswith("/"):
+            self.data_path += "/"
+
+    def __getitem__(self, index: int):
+        kind, image_n, label = self.kinds[index], self.image_names[index], self.labels[index]
+
+        if self.decoder == "NR":
+            img_t = torch.load(self.data_path + image_n,map_location="cpu")
+            image = img_t[0].permute(1,2,0).cpu().numpy()
+        else:
+            raise ValueError(f"The decoder {self.decoder} is not supported")
+        
+        if self.transforms:
+            sample = {"image": image}
+            sample = self.transforms(**sample)
+            image = sample["image"]
+        
+        if self.return_name: 
+            return image, label, image_n
+        else: 
+            return image, label
+        
+    def __len__(self) -> int:
+        return self.image_names.shape[0]
     
+    def get_labels(self):
+        return list(self.labels)
+
+
 class TrainRetriever_hdf5(Dataset):
 
     def __init__(self, data_path, kinds, image_names, labels, decoder='NR', transforms=None, return_name=False):

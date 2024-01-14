@@ -1,4 +1,4 @@
-WORK_DIR = '/gpfswork/rech/ohz/una46ym/'
+WORK_DIR = '/home/lucas/Documents/Master Data Science/S1/Research_project/'
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -31,6 +31,8 @@ class LitModel(pl.LightningModule):
     """
     def __init__(self,
                  data_path: Union[str, Path],
+                 cover_folder_name: str,
+                 stego_folder_name: str,
                  backbone: str = 'mixnet_s',
                  batch_size: int = 32,
                  pair_constraint: int = 0,
@@ -55,6 +57,8 @@ class LitModel(pl.LightningModule):
         
         super().__init__()
         self.data_path = data_path
+        self.cover_folder_name = cover_folder_name
+        self.stego_folder_name = stego_folder_name
         self.epochs = epochs
         self.backbone = backbone
         self.batch_size = batch_size
@@ -79,6 +83,12 @@ class LitModel(pl.LightningModule):
             self.data_path = self.data_path+'QF_'+self.qf+'/'
         if self.pair_constraint:
             self.effective_batch_size = 2*self.batch_size
+        if not self.data_path.endswith("/"):
+            self.data_path += "/"
+        if not self.cover_folder_name.endswith("/"):
+            self.cover_folder_name += "/"
+        if not self.stego_folder_name.endswith("/"):
+            self.stego_folder_name += "/"
         
         self.save_hyperparameters()
 
@@ -139,7 +149,7 @@ class LitModel(pl.LightningModule):
         self.log("train_loss", train_loss, on_step=False, on_epoch=True,  prog_bar=True, logger=True, sync_dist=False)
         
         for metric_name in self.train_metrics.keys():
-            self.log(metric_name, getattr(self, metric_name)(y_logits, y), on_step=False, on_epoch=False, prog_bar=True, logger=False, sync_dist=False)
+            self.log(metric_name, getattr(self, metric_name)(y_logits, y), on_step=True, on_epoch=False, prog_bar=True, logger=True, sync_dist=False)
 
         return train_loss
 
@@ -248,38 +258,24 @@ class LitModel(pl.LightningModule):
         if self.size != '':
             sizes = [self.size]
         
-        classes = ['Cover', 'Cover2', 'chroma_unif/0.05', 'chroma_unif2/0.05']
-        #classes = ['JPG_trunc/QF_100/Cover', 'JPG_libjpeg6b/QF_100/Cover', 'JPG_libjpeg7/QF_100/Cover', 'JPG_libjpeg6b_full/QF_100/Cover']
-        if self.payload != '':
-            classes = ['Cover', self.alg + '/' + self.payload]
-        elif self.alg != '':
-            classes = ['Cover', self.alg]
+        classes = ['Cover', 'Stego']
+        # if self.payload != '':
+        #     classes = ['Cover', self.alg + '/' + self.payload]
+        # elif self.alg != '':
+        #     classes = ['Cover', self.alg]
         IL_train = []
         IL_val = []
         
-        
-        #for size in sizes:
-        #    with open('/home/jbutora/QF100/IL_train_'+size+'.p', 'rb') as handle:
-        #        IL_train.extend(pickle.load(handle))
-        #    with open('/home/jbutora/QF100/IL_val_'+size+'.p', 'rb') as handle:
-        #        IL_val.extend(pickle.load(handle))
-        with open(WORK_DIR + 'DataBase/BOSSBase512/IL_train_n.p', 'rb') as handle:
+        with open(WORK_DIR + 'JIN_SRNet/IL_train.p', 'rb') as handle:
             IL_train.extend(pickle.load(handle))
-        with open(WORK_DIR + 'DataBase/BOSSBase512/IL_val_n.p', 'rb') as handle:
+        with open(WORK_DIR + 'JIN_SRNet/IL_val.p', 'rb') as handle:
             IL_val.extend(pickle.load(handle))
-#         if (not IL_train[0].endswith('jpg')) and self.qf !='':
-#             for i,name in enumerate(IL_train):
-#                 IL_train[i] = name[:-3] + 'jpg'
-#             for i,name in enumerate(IL_val):
-#                 IL_val[i] = name[:-3] + 'jpg'
-        
-#         with open(WORK_DIR + 'DataBase/ALASKAv2/IL_train.p', 'rb') as handle:
-#             IL_train.extend(pickle.load(handle))
-#         with open(WORK_DIR + 'DataBase/ALASKAv2/IL_val.p', 'rb') as handle:
-#             IL_val.extend(pickle.load(handle))
             
-        
-
+        if not IL_train[0].endswith("pt"):
+            for i, name in enumerate(IL_train):
+                IL_train[i] = name[:-3] + "pt"
+            for i, name in enumerate(IL_val):
+                IL_val[i] = name[:-3] + "pt"
 
         dataset = []
         
@@ -303,20 +299,32 @@ class LitModel(pl.LightningModule):
                     })
         
         if self.pair_constraint == False:
-            retriever = TrainRetriever_hdf5
+            retriever = TrainRetriever_pt
             for label, kind in enumerate(classes):
                 for path in IL_train:
+                    if kind == "Cover":
+                        image_name = self.cover_folder_name + path
+                    elif kind == "Stego":
+                        image_name = self.stego_folder_name + path
+                    else:
+                        raise ValueError(f"Unsupported kind -> {kind}")
                     dataset.append({
                         'kind': kind,
-                        'image_name': path,
+                        'image_name': image_name,
                         'label': label,
                         'fold':1,
                     })
             for label, kind in enumerate(classes):
                 for path in IL_val:
+                    if kind == "Cover":
+                        image_name = self.cover_folder_name + path
+                    elif kind == "Stego":
+                        image_name = self.stego_folder_name + path
+                    else:
+                        raise ValueError(f"Unsupported kind -> {kind}")
                     dataset.append({
                         'kind': kind,
-                        'image_name': path,
+                        'image_name': image_name,
                         'label': label,
                         'fold':0,
                     })
@@ -332,7 +340,8 @@ class LitModel(pl.LightningModule):
             transforms=get_train_transforms(),
             decoder=self.decoder
         )
-        
+        # print("==================================================")
+        # print(self.train_dataset)
         self.valid_dataset = retriever(
             data_path=self.data_path,
             kinds=dataset[dataset['fold'] == 0].kind.values,
@@ -380,10 +389,20 @@ class LitModel(pl.LightningModule):
                             metavar='BK',
                             help='Name (as in ``torchvision.models``) of the feature extractor')
         parser.add_argument('--data-path',
-                            default='/media/alaska2/all_qfs/',
+                            default='/home/lucas/Documents/Master Data Science/S1/Research_project/JIN_SRNet/',
                             type=str,
                             metavar='dp',
                             help='data path')
+        parser.add_argument('--cover-folder-name',
+                            default='BossBase-1.01-cover/',
+                            type=str,
+                            metavar='cfn',
+                            help="cover folder's name")
+        parser.add_argument('--stego-folder-name',
+                            default='stego_1_5bit/',
+                            type=str,
+                            metavar='sfn',
+                            help="stego folder's name")
         parser.add_argument('--epochs',
                             default=50,
                             type=int,

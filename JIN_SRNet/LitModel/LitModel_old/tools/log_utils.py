@@ -6,7 +6,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from typing import Any
 
-WORK_DIR = '/gpfswork/rech/ohz/una46ym/'
+WORK_DIR = '/home/lucas/Documents/Master Data Science/S1/Research_project/'
 
 class CustomLearningRateMonitor(LearningRateMonitor):
     def on_train_epoch_start(self, trainer: "pl.Trainer", *args: Any, **kwargs: Any) -> None:
@@ -22,7 +22,7 @@ class CustomLearningRateMonitor(LearningRateMonitor):
 
 def setup_callbacks_loggers(args):
 
-    log_path = os.path.join(WORK_DIR, 'LogFiles', 'QF_'+args.qf, args.alg, args.payload, 
+    log_path = os.path.join(WORK_DIR, 'LogFiles', args.alg, args.payload, 
                             args.backbone, args.version)
 
     tb_logger = TensorBoardLogger(log_path, name="", version="", default_hp_metric=False)

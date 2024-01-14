@@ -16,7 +16,7 @@ from tools.log_utils import setup_callbacks_loggers
 
 seed_everything(1994)
 
-WORK_DIR = '/gpfswork/rech/ohz/una46ym/'
+WORK_DIR = '/home/lucas/Documents/Master Data Science/S1/Research_project/'
 
 def main(args):
     """ Main training routine specific for this project. """
@@ -45,38 +45,37 @@ def main(args):
     if args.size != '':
         sizes = [args.size]
         
-    classes = ['Cover', 'JUNI']
-    #classes = ['JPG_trunc/QF_100/Cover', 'JPG_libjpeg6b/QF_100/Cover', 'JPG_libjpeg7/QF_100/Cover', 'JPG_libjpeg6b_full/QF_100/Cover']
+    classes = ['Cover', 'Stego']
     if args.payload != '':
         classes = ['Cover', args.alg + '/' + args.payload]
     elif args.alg != '':
         classes = ['Cover', args.alg]
         
     IL_test = []
-    with open(WORK_DIR + 'DataBase/BOSSBase512/IL_test_n.p', 'rb') as handle:
+    with open(WORK_DIR + 'JIN_SRNet/IL_test.p', 'rb') as handle:
             IL_test.extend(pickle.load(handle))
-            
-    # if (not IL_test[0].endswith('jpg')) and args.qf !='':
-    #         for i,name in enumerate(IL_test):
-    #             IL_test[i] = name[:-3] + 'jpg'
-#     with open(WORK_DIR + 'DataBase/ALASKAv2/IL_test.p', 'rb') as handle:
-#             IL_test.extend(pickle.load(handle))
 
-#     for size in sizes:
-#         with open('/home/jbutora/QF100/IL_test_'+size+'.p', 'rb') as handle:
-#             IL_test.extend(pickle.load(handle))
+    if not IL_test[0].endswith("pt"):
+        for i, name in enumerate(IL_test):
+            IL_test[i] = name[:-3] + "pt"  
             
     dataset = []
     for label, kind in enumerate(classes):
         for path in IL_test:
+            if kind == "Cover":
+                image_name = model.cover_folder_name + path
+            elif kind == "Stego":
+                image_name = model.stego_folder_name + path
+            else:
+                raise ValueError(f"Unsupported kind -> {kind}")
             dataset.append({
                 'kind': kind,
-                'image_name': path,
+                'image_name': image_name,
                 'label': label,
                 'fold':2,
             })
     dataset = pd.DataFrame(dataset)
-    test_dataset = TrainRetriever_hdf5(
+    test_dataset = TrainRetriever_pt(
             data_path=model.data_path,
             kinds=dataset[dataset['fold'] == 2].kind.values,
             image_names=dataset[dataset['fold'] == 2].image_name.values,
