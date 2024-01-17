@@ -1,4 +1,5 @@
 # Custom Ignores
+*checkpoints/
 *.zip
 /data1
 /flicker_2W_images
