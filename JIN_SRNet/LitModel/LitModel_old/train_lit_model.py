@@ -6,13 +6,16 @@ import sys
 
 # sys.path.append("/linkhome/rech/gencrl01/una46ym/LitModel/")
 warnings.simplefilter(action="ignore", category=FutureWarning)
+warnings.simplefilter(action="ignore",category=UserWarning)
 import os
 from pathlib import Path
 from argparse import ArgumentParser
 from LitModel import *
 import torch
 from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.utilities.rank_zero import LightningDeprecationWarning
 from tools.log_utils import setup_callbacks_loggers
+warnings.simplefilter(action="ignore",category=LightningDeprecationWarning)
 
 seed_everything(666)
 
@@ -36,11 +39,9 @@ def main(args):
                      benchmark=True,
                      sync_batchnorm=len(args.gpus or '') > 1,
                      #progress_bar_refresh_rate=0,
-                     enable_progress_bar=False,
+                     enable_progress_bar=True,
                      resume_from_checkpoint=args.resume_from_checkpoint)
     
-    print("======================================================")
-    print(Trainer.devices)
 
     if args.seed is not None:
         print("Seeding from", args.seed)

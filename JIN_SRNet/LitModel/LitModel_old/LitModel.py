@@ -149,7 +149,7 @@ class LitModel(pl.LightningModule):
         self.log("train_loss", train_loss, on_step=False, on_epoch=True,  prog_bar=True, logger=True, sync_dist=False)
         
         for metric_name in self.train_metrics.keys():
-            self.log(metric_name, getattr(self, metric_name)(y_logits, y), on_step=True, on_epoch=False, prog_bar=True, logger=True, sync_dist=False)
+            self.log(metric_name, getattr(self, metric_name)(y_logits, y), on_step=False, on_epoch=True, prog_bar=True, logger=True, sync_dist=False)
 
         return train_loss
 
