@@ -97,6 +97,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.probability > 0.:
         info = f"p = {args.probability}\nH3(p) = {H(args.probability)}"
+        if not os.path.exists(args.output):
+            os.makedirs(args.output,exist_ok=True)
         with open(args.output + "/" + "_info.txt","w") as f:
             f.write(info)
     precover_to_cover(args.name, args.output, args.model, args.probability, args.begin, args.end)
