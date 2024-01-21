@@ -32,3 +32,7 @@ thursday 11  january -> 4pm next meeting should have the training
 
 thursday 18: 4pm meeting
 Lundi 29 janvier: 3pm45 meeting
+
+Implémenter la méthode d'insertion avec l'erreur de quantification.
+-> train JinSRNet on nex generated datasets
+
