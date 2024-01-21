@@ -30,5 +30,5 @@ python precover_processing.py -n path_to_precover_folder -o path_to_output_folde
 ```
 Launch the training with the following command:
 ```bash
-python -u JIN_SRNet/LitModel/LitModel_old/train_lit_model.py --version RJCA --backbone srnet --batch-size 8 --pair-constraint 0 --lr 1e-3 --eps 1e-7 --lr-scheduler-name onecycle --optimizer-name adamax --epochs 50 --gpus 0 --weight-decay 2e-4 --decoder NR --data-path path_to_root_of_the_project/JIN_SRNet/ --seed ./JIN_SRNet/JIN_SRNet/epoch=56_val_wAUC=0.8921.pt --cover-folder-name BossBase-1.01-cover --stego-folder-name stego_001bit --payload 0_01
+python -u JIN_SRNet/LitModel/LitModel_old/train_lit_model.py --version RJCA --backbone srnet --batch-size 8 --pair-constraint 0 --lr 1e-3 --eps 1e-7 --lr-scheduler-name onecycle --optimizer-name adamax --epochs 50 --gpus 0 --weight-decay 2e-4 --decoder NR --data-path path_to_root_of_the_project/JIN_SRNet/ --seed ./JIN_SRNet/JIN_SRNet/epoch=56_val_wAUC=0.8921.pt --cover-folder-name cover_folder_name --stego-folder-name stego_folder_name --payload 0_01
 ```
