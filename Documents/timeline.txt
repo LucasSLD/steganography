@@ -25,10 +25,11 @@
     - sauvegarde des images sous forme de tenseur
     - regénération des folder cover et stego
 
-19 décembre - ??:
+19 décembre - 18 Janvier:
     - exploration du code LitModel pour réaliser le transfert learning de SRNet
     - modification du code de LitModel.py pour l'adapter à mon cas d'étude (LitModel.py)
     - ecriture de mon TrainRetriever (retriever.py) pour pouvoir charger mes images pour le training
+    - transfer learning de SRNet sur les datasets avec différents payloads (1.5bit, 0.4bit, 0.3bit, 0.2bit, 0.01bit)
 
 Training : have 25% error with naive insertion, 20-50 epochs (install tensor board)
 
