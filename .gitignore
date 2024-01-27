@@ -1,4 +1,5 @@
 # Custom Ignores
+*stego/
 *Images/
 *checkpoints/
 *.zip
