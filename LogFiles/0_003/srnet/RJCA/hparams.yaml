@@ -1,0 +1,26 @@
+alg: ''
+backbone: srnet
+batch_size: 8
+cover_folder_name: BossBase-1.01-cover
+data_path: /home/lucas/Documents/Master Data Science/S1/Research_project/JIN_SRNet/
+decoder: NR
+epochs: 50
+eps: 1.0e-07
+gpus: '0'
+in_channels: 0
+lr: 0.001
+lr_scheduler_name: onecycle
+num_workers: 6
+optimizer_name: adamax
+pair_constraint: 0
+payload: '0_003'
+qf: ''
+qf2: ''
+resume_from_checkpoint: null
+save: 0
+seed: ./JIN_SRNet/JIN_SRNet/epoch=56_val_wAUC=0.8921.pt
+size: ''
+stego_folder_name: stego_1e_4
+surgery: ''
+version: RJCA
+weight_decay: 0.0002
