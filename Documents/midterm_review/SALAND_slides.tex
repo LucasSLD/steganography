@@ -1,0 +1,199 @@
+% *** DOCUMENT CLASS ***%
+\documentclass[11pt,compress]{beamer} % handout,
+\usetheme{Madrid}
+\usecolortheme{crane}
+\useoutertheme[subsection=false,shadow]{miniframes}
+
+% ! full class documentation available here
+% http://tug.ctan.org/macros/latex/contrib/beamer/doc/beameruserguide.pdf
+
+%===============================================
+% *** GENERAL PACKAGES *** %
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{lipsum}
+
+%===============================================
+% *** ALGORITHM PACKAGE *** %
+\usepackage[ruled,vlined]{algorithm2e}
+\newcommand{\forcond}[2]{#1 \KwTo #2}
+\SetAlgoSkip{}
+
+%===============================================
+% *** GRAPHICS RELATED PACKAGES *** %
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf,.jpg,.png,.gif}
+\graphicspath{{figs/}}
+
+%===============================================
+% *** MATH PACKAGES *** %
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathrsfs} % Ralph Smith’s Formal Script Font : mathrsfs{A}
+\usepackage{mathtools}
+\usepackage{siunitx}  % physics units
+\usepackage{bm}
+
+%===============================================
+% *** BIBLIOGRAPHY PACKAGE *** 
+\usepackage[backend=biber, style=authortitle]{biblatex}
+\addbibresource{LaTeX_Report.bib}
+\usepackage{appendixnumberbeamer}
+
+% display table of content at the beginning of each section
+ \AtBeginSection[] {
+ \ifnum \value{section}=1
+   {
+   \begin{frame}
+     \frametitle{Overview}
+       \small \tableofcontents[sectionstyle=show/shaded]
+   \end{frame}
+   }
+ \else{
+   \begin{frame}
+       \small \tableofcontents[currentsection,sectionstyle=show/shaded,hideothersubsections]
+   \end{frame}}
+ \fi
+ }
+\setbeamertemplate{caption}[numbered]
+
+\newcommand\blfootnote[1]{%
+ \begingroup
+ \renewcommand\thefootnote{}\footnote[frame]{#1}%
+ \addtocounter{footnote}{-1}%
+ \endgroup
+}
+
+\begin{document}
+
+\title[]{Steganography on AI-compressed images}
+\author{Lucas \textsc{SALAND}}
+\institute{Université de Lille}
+\date[\today]{\includegraphics[keepaspectratio,width=0.2\textwidth]{Images/ulille.png} \medskip \\ Lille, France \medskip \\ \today}
+
+\frame{\titlepage}
+
+\section*{Overview}
+\begin{frame}
+  \tableofcontents
+\end{frame}
+
+\section{Context}
+\subsection{AI-compressed images}
+\begin{frame}{AI-compressed images}
+  \only<1>{
+    \centering
+    \includegraphics[width=10cm]{./Images/iclr17.png}
+  }
+  \only<2>{
+    \begin{center}
+      \textbf{Autoencoder}
+      \begin{figure}
+        \includegraphics[width=10cm]{./Images/autoencoder.png}
+      \end{figure}
+    \end{center}
+    }
+\end{frame}
+
+\subsection{Steganography \& Steganalysis}
+
+\begin{frame}{Steganography \& Steganalysis}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{block}{Steganography}
+        Hiding a message within another content.
+      \end{block}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Steganalysis}
+        Detecting if a message carries hidden information, embedded through steganography.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Objectives}
+\begin{frame}{Objectives}
+  \begin{itemize}
+    \item Embed undetectable messages into compressed format with naive insertion ($\pm1$ on LSB);
+    \item Analyse induced distortion on decompressed images;
+    \item Use quantization error to reduce detectability.
+  \end{itemize}
+\end{frame}
+
+
+\section{Completed work}
+\begin{frame}{AI compression}
+  \begin{itemize}
+    \item Read "\lowercase{END-TO-END OPTIMIZED IMAGE COMPRESSION}"
+    \item Cloned iclr\_17\_compression repository from github (implementation of the paper)
+    \item Generated training dataset
+    \item Trained ImageCompressor model
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Steganography}
+  \begin{itemize}
+    \item Created ImageCompressorSteganography model $\rightarrow$ naive insertion
+    \item python script for generation of cover and stego images using BossBase dataset
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Steganalysis}
+  \only<1>{
+    \begin{figure}
+      \includegraphics[width=0.45\textwidth]{./Images/cover.png}
+      \includegraphics[width=0.45\textwidth]{./Images/stego_0_1.png}
+    \end{figure}
+  }
+  \only<2>{
+    \begin{figure}
+      \includegraphics[width=0.45\textwidth]{./Images/cover.png}
+      \includegraphics[width=0.45\textwidth]{./Images/stego_0_01.png}
+    \end{figure}
+  }
+  \only<3>{
+    \begin{figure}
+      \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_1.png}
+      \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_01.png}
+    \end{figure}
+    }
+  \only<4>{
+    \centering
+    \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_001.png}
+  }
+  \only<5>{
+    \begin{itemize}
+      \item Borrowed JINSRNet code and weights from Jan Butora as well as training scripts
+      \item Adapted the code to work with pytorch tensors
+      \item Performed transfer learning with JINSRNet pretrained model on generated cover/stego datasets
+    \end{itemize}
+  }
+  \only<6>{
+    \begin{figure}
+      \includegraphics[height=0.5\textheight]{./Images/legend.png}
+      \includegraphics[height=0.5\textheight]{./Images/val_PE.png}
+      \caption[short]{Prediction error on validation dataset}
+    \end{figure}
+  }
+\end{frame}
+
+\section{What's next}
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+
+\end{frame}
+
+% \begin{frame}{References}
+%   \printbibliography
+% \end{frame}
+\end{document}
+
