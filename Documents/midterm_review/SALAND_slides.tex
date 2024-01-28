@@ -40,6 +40,7 @@
 \usepackage{mathtools}
 \usepackage{siunitx}  % physics units
 \usepackage{bm}
+\usepackage{stmaryrd}
 
 %===============================================
 % *** BIBLIOGRAPHY PACKAGE *** 
@@ -144,6 +145,9 @@
     \item Created ImageCompressorSteganography model $\rightarrow$ naive insertion
     \item python script for generation of cover and stego images using BossBase dataset
   \end{itemize}
+  \begin{figure}
+    \includegraphics[width=0.5\textwidth]{./Images/naive_insertion.png}
+  \end{figure}
 \end{frame}
 
 \begin{frame}{Steganalysis}
@@ -186,7 +190,30 @@
 \end{frame}
 
 \section{What's next}
-\section{Conclusion}
+\begin{frame}{Insertion with quantization error}
+  \only<1>{
+    \begin{figure}
+      \includegraphics[width=0.7\textwidth]{./Images/quantization_error.png}
+    \end{figure}
+  }
+  \begin{itemize}
+    \item i: index of coefficient
+    \item k $\in \{-1,0,1\}$
+    \item $c_{i,k}, i, k \in \llbracket 1,nb\ of\ coeff \rrbracket \times \{-1,0,1\}$: octs of adding k to i-th coefficient
+    \item $p_{i,k}$: probability of adding k to the rounded i-th coefficient.
+    \item m: size of the message to embed
+  \end{itemize}
+  \only<2>{
+    \begin{itemize}
+      \item Constraint: $\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{H_3(p_{i,k})}} = m$ (C)
+      \item Optimization: min($\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$)
+    \end{itemize}
+    \centering
+    $\boxed{p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{\sum_{k=-1}^{1}{e^{-\lambda c_{i,k}}}},\ \lambda\ s.t.\ (C)\ is\ verified.}$
+  }
+\end{frame}
+
+\section*{Conclusion}
 
 \begin{frame}{Conclusion}
 
