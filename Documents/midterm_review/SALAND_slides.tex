@@ -75,7 +75,7 @@
 \begin{document}
 
 \title[]{Steganography on AI-compressed images}
-\author{Lucas \textsc{SALAND}}
+\author{Lucas SALAND\\ Supervisors: Patrick Bas, Jan Butora}
 \institute{Université de Lille}
 \date[\today]{\includegraphics[keepaspectratio,width=0.2\textwidth]{Images/ulille.png} \medskip \\ Lille, France \medskip \\ \today}
 
@@ -97,9 +97,10 @@
     \begin{center}
       \textbf{Autoencoder}
       \begin{figure}
-        \includegraphics[width=10cm]{./Images/autoencoder.png}
+        \includegraphics[width=7cm]{./Images/autoencoder.png}
       \end{figure}
     \end{center}
+    Objective: minimize weighted sum of the rate of compression and distortion
     }
 \end{frame}
 
@@ -123,8 +124,8 @@
 \section{Objectives}
 \begin{frame}{Objectives}
   \begin{itemize}
-    \item Embed undetectable messages into compressed format with naive insertion ($\pm1$ on LSB);
-    \item Analyse induced distortion on decompressed images;
+    \item Embed undetectable messages into compressed format with naive insertion ($\pm1$ on LSB);\vspace{.7cm}
+    \item Analyse induced distortion on decompressed images;\vspace{.7cm}
     \item Use quantization error to reduce detectability.
   \end{itemize}
 \end{frame}
@@ -132,12 +133,20 @@
 
 \section{Completed work}
 \begin{frame}{AI compression}
-  \begin{itemize}
-    \item Read "\lowercase{END-TO-END OPTIMIZED IMAGE COMPRESSION}"
-    \item Cloned iclr\_17\_compression repository from github (implementation of the paper)
-    \item Generated training dataset
-    \item Trained ImageCompressor model
-  \end{itemize}
+  \only<1>{
+    \begin{itemize}
+      \item Read "\lowercase{END-TO-END OPTIMIZED IMAGE COMPRESSION}"\vspace{.4cm}
+      \item Cloned iclr\_17\_compression repository from github (implementation of the paper)\vspace{.4cm}
+      \item Generated training dataset\vspace{.4cm}
+      \item Trained ImageCompressor model
+    \end{itemize}
+  }
+  \only<2>{
+    \begin{figure}
+      \includegraphics[width=.45\textwidth]{./Images/precover.png}
+      \includegraphics[width=.45\textwidth]{./Images/compressed.png}
+    \end{figure}
+  }
 \end{frame}
 
 \begin{frame}{Steganography}
@@ -148,77 +157,75 @@
   \begin{figure}
     \includegraphics[width=0.5\textwidth]{./Images/naive_insertion.png}
   \end{figure}
+  \centering
+  Entropy: $H_3(p) = -2p*log_2(p) - (1-2p)*log_2(1-2p)$ (bits per coefficient)
 \end{frame}
 
 \begin{frame}{Steganalysis}
   \only<1>{
-    \begin{figure}
-      \includegraphics[width=0.45\textwidth]{./Images/cover.png}
-      \includegraphics[width=0.45\textwidth]{./Images/stego_0_1.png}
-    \end{figure}
-  }
-  \only<2>{
-    \begin{figure}
-      \includegraphics[width=0.45\textwidth]{./Images/cover.png}
-      \includegraphics[width=0.45\textwidth]{./Images/stego_0_01.png}
-    \end{figure}
-  }
-  \only<3>{
-    \begin{figure}
-      \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_1.png}
-      \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_01.png}
-    \end{figure}
-    }
-  \only<4>{
-    \centering
-    \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_001.png}
-  }
-  \only<5>{
     \begin{itemize}
-      \item Borrowed JINSRNet code and weights from Jan Butora as well as training scripts
-      \item Adapted the code to work with pytorch tensors
-      \item Performed transfer learning with JINSRNet pretrained model on generated cover/stego datasets
+      \item Borrowed JINSRNet code and weights from Jan Butora as well as training scripts\vspace{.5cm}
+      \item Adapted the code to work with pytorch tensors\vspace{.5cm}
+      \item Finetuned JINSRNet pretrained model on generated cover/stego datasets
     \end{itemize}
-  }
-  \only<6>{
-    \begin{figure}
-      \includegraphics[height=0.5\textheight]{./Images/legend.png}
-      \includegraphics[height=0.5\textheight]{./Images/val_PE.png}
-      \caption[short]{Prediction error on validation dataset}
-    \end{figure}
-  }
+    }
+    \only<2>{
+      \begin{figure}
+        \includegraphics[height=0.5\textheight]{./Images/legend.png}
+        \includegraphics[height=0.5\textheight]{./Images/val_PE.png}
+        \caption[short]{Prediction error on validation dataset}
+      \end{figure}
+      Either the detection is too easy (payload $\geq$ 0.003) or too hard (payload $\leq$ 0.001)
+      }
+      \only<3>{
+        \begin{figure}
+          \includegraphics[width=0.45\textwidth]{./Images/cover.png}
+          \includegraphics[width=0.45\textwidth]{./Images/stego_0_1.png}
+        \end{figure}
+      }
+      \only<4>{
+        \begin{figure}
+          \includegraphics[width=0.45\textwidth]{./Images/cover.png}
+          \includegraphics[width=0.45\textwidth]{./Images/stego_0_01.png}
+        \end{figure}
+      }
+      \only<5>{
+        \begin{figure}
+          \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_1.png}
+          \includegraphics[width=0.45\textwidth]{./Images/cover_stego_0_01.png}
+        \end{figure}
+        }
+      \only<6>{
+        \centering
+        \includegraphics[height=.9\textheight]{./Images/cover_stego_0_001.png}
+      }
 \end{frame}
 
 \section{What's next}
 \begin{frame}{Insertion with quantization error}
-  \only<1>{
-    \begin{figure}
-      \includegraphics[width=0.7\textwidth]{./Images/quantization_error.png}
-    \end{figure}
-  }
   \begin{itemize}
-    \item i: index of coefficient
-    \item k $\in \{-1,0,1\}$
-    \item $c_{i,k}, i, k \in \llbracket 1,nb\ of\ coeff \rrbracket \times \{-1,0,1\}$: octs of adding k to i-th coefficient
-    \item $p_{i,k}$: probability of adding k to the rounded i-th coefficient.
-    \item m: size of the message to embed
+    \item LSB insertion is too naive and easy to detect
+    \item Using quantization error to have higher probability of modification where the error is higher
+    \item Constraint: $\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{H_3(p_{i,k})}} = m$ (C)
+    \item Optimization: min($\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$)
   \end{itemize}
-  \only<2>{
-    \begin{itemize}
-      \item Constraint: $\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{H_3(p_{i,k})}} = m$ (C)
-      \item Optimization: min($\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$)
-    \end{itemize}
-    \centering
-    $\boxed{p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{\sum_{k=-1}^{1}{e^{-\lambda c_{i,k}}}},\ \lambda\ s.t.\ (C)\ is\ verified.}$
-  }
+  Lagrangian optimization problem
+  \centering
+  $p_{i,k} = function(i,k,\lambda)$
+  $\boxed{p_{i,k} = function(i,k,\lambda),\ \lambda\ s.t.\ (C)\ is\ verified.}$
 \end{frame}
 
-\section*{Conclusion}
-
-\begin{frame}{Conclusion}
-
+\begin{frame}{Other ideas}
+  \begin{itemize}
+    \item steganography on RGB images
+    \item comparison with JPEG on steganalysis
+  \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \centering
+  Questions
+\end{frame}
 % \begin{frame}{References}
 %   \printbibliography
 % \end{frame}
