@@ -1,8 +1,8 @@
 import sys, os, shutil, traceback, subprocess
 import numpy as np
 import pickle
-from .unholyException import UnholyException
-from . import global_vars
+# from .unholyException import UnholyException
+# from . import global_vars
 from multiprocessing import Pool, cpu_count
 from fnmatch import fnmatch
 from glob import glob

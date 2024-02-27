@@ -3,7 +3,7 @@
 import numpy as np
 import h5py
 
-from ...utils.utils import Utils
+from utils import Utils
 
 """
 Tools for steganographic algorithms
