@@ -16,6 +16,7 @@ from models import *
 sys.path.append("../quantization_error/")
 from embedding_simulator import Embedding_simulator as es
 from math import log
+import matplotlib.pyplot as plt
 
 def save_model(model, iter, name):
     torch.save(model.state_dict(), os.path.join(name, "iter_{}.pth.tar".format(iter)))
@@ -141,7 +142,7 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
         self.out_channel_N = out_channel_N
         self.p = p
 
-    def forward(self, input_image, stega=False):
+    def forward(self, input_image, stega=False, plot_hist=False, return_modification_rate=False):
         quant_noise_feature = torch.zeros(input_image.size(0), self.out_channel_N, input_image.size(2) // 16, input_image.size(3) // 16).cuda()
         quant_noise_feature = torch.nn.init.uniform_(torch.zeros_like(quant_noise_feature), -0.5, 0.5)
         feature = self.Encoder(input_image)
@@ -152,12 +153,36 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
             shape = compressed_feature_renorm.shape[1:]
             message_length = ternary_entropy(self.p)
             quantization_error = torch.sub(feature,compressed_feature_renorm).flatten()
+            
             rho_P1 = (1 - 2*quantization_error).cpu().numpy()
             rho_M1 = (1 + 2*quantization_error).cpu().numpy()
             p_change_P1, p_change_M1 = es.compute_proba(rho_P1,rho_M1,message_length,shape[0]*shape[1]*shape[2])
-            feature_QE = es.process(compressed_feature_renorm.cpu().numpy().flatten(),p_change_P1,p_change_M1)
+            
+            if plot_hist:
+                plt.hist(quantization_error.cpu().numpy(),50)
+                plt.grid()
+                plt.yscale("log")
+                plt.title("Quantization error histogram")
+                plt.show()
+                
+                plt.hist(p_change_M1,50)
+                plt.grid()
+                plt.title("Histogram of -1 probabilities")
+                plt.yscale("log")
+                plt.show()
+                
+                plt.hist(p_change_P1,50)
+                plt.grid()
+                plt.yscale("log")
+                plt.title("Histogram of +1 probabilities")
+                plt.show()
+                print("number of coef in latent space:",p_change_M1.shape[0])
+                print("number of positive proba of -1:",np.count_nonzero(p_change_M1))
+                print("number of positive proba of +1:",np.count_nonzero(p_change_P1))
+
+            compressed_feature_np_flat = compressed_feature_renorm.cpu().numpy().flatten()
+            feature_QE = es.process(compressed_feature_np_flat,p_change_P1,p_change_M1) # flattened coefficients in latent space with modification using quantization error
             compressed_feature_renorm[0] = torch.Tensor(feature_QE).reshape(shape[0],shape[1],shape[2])
-            print(torch.mean((compressed_feature_renorm == torch.round(feature)).float()))
 
         recon_image = self.Decoder(compressed_feature_renorm)
         # recon_image = prediction + recon_res
@@ -173,5 +198,9 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
         total_bits_feature, _ = iclr18_estimate_bits_z(compressed_feature_renorm)
         im_shape = input_image.size()
         bpp_feature = total_bits_feature / (batch_size * im_shape[2] * im_shape[3])
+
+        if return_modification_rate and stega:
+            modification_rate = np.count_nonzero(feature_QE - compressed_feature_np_flat)/feature_QE.shape[0] # nb of modified coef/ total number of coef
+            return clipped_recon_image, mse_loss, bpp_feature, modification_rate
 
         return clipped_recon_image, mse_loss, bpp_feature
