@@ -135,7 +135,7 @@ def apply_qe_to_bossbase_img(
         
         img_t = pgm_to_tensor(precover_folder_path + "/" + str(idx) + ".pgm")
         cover_t, _, _ = net(img_t,stega=False)
-        stego_t, _, _, modification_rate = net(img_t,stega=True,return_modification_rate=True)
+        stego_t, _, _, modification_rate = net(img_t,stega=True,return_modification_rate=True,print_positive_proba=True)
 
         if plot_cover_stego:
             plot_tensor(cover_t,"cover")
