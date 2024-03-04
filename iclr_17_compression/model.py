@@ -151,7 +151,7 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
 
         if stega:
             shape = compressed_feature_renorm.shape[1:]
-            message_length = ternary_entropy(self.p)
+            message_length = ternary_entropy(self.p) * shape[0]*shape[1]*shape[2]
             quantization_error = torch.sub(feature, compressed_feature_renorm).flatten()
             
             rho_P1 = (1 - 2*quantization_error).cpu().numpy()
