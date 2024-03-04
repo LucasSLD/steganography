@@ -142,7 +142,7 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
         self.out_channel_N = out_channel_N
         self.p = p
 
-    def forward(self, input_image, stega=False, plot_hist=False, return_modification_rate=False):
+    def forward(self, input_image, stega=False, plot_hist=False, return_modification_rate=False, print_positive_proba=False):
         quant_noise_feature = torch.zeros(input_image.size(0), self.out_channel_N, input_image.size(2) // 16, input_image.size(3) // 16).cuda()
         quant_noise_feature = torch.nn.init.uniform_(torch.zeros_like(quant_noise_feature), -0.5, 0.5)
         feature = self.Encoder(input_image)
@@ -152,7 +152,7 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
         if stega:
             shape = compressed_feature_renorm.shape[1:]
             message_length = ternary_entropy(self.p)
-            quantization_error = torch.sub(feature,compressed_feature_renorm).flatten()
+            quantization_error = torch.sub(feature, compressed_feature_renorm).flatten()
             
             rho_P1 = (1 - 2*quantization_error).cpu().numpy()
             rho_M1 = (1 + 2*quantization_error).cpu().numpy()
@@ -179,10 +179,35 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
                 print("number of coef in latent space:",p_change_M1.shape[0])
                 print("number of positive proba of -1:",np.count_nonzero(p_change_M1))
                 print("number of positive proba of +1:",np.count_nonzero(p_change_P1))
+            
 
             compressed_feature_np_flat = compressed_feature_renorm.cpu().numpy().flatten()
             feature_QE = es.process(compressed_feature_np_flat,p_change_P1,p_change_M1) # flattened coefficients in latent space with modification using quantization error
             compressed_feature_renorm[0] = torch.Tensor(feature_QE).reshape(shape[0],shape[1],shape[2])
+            
+            if print_positive_proba: 
+                # print all > 0 probabilities of change (+1 or -1)
+                def get_index_value(a):
+                    """
+                    Returns a sorted 2D array where each row is a couple (index, value)
+                    Args:
+                        a (ndarray): 1D array 
+
+                    Returns:
+                        ndarray: 2D array sorted by rows based on the value
+                    """
+                    return np.array(sorted(
+                            list(zip(np.nonzero(a)[0],a[a != 0])),
+                            key= lambda x: x[1],
+                            reverse=True))
+
+                print("1st column = index in vector of probability ; 2nd colmun = value of the proba of change")
+                print("+1 positive probabilities:\n",get_index_value(p_change_P1))
+                print("=========================")
+                print("-1 positive probabilities:\n",get_index_value(p_change_M1))
+
+                # checking if the modifications in latent space happened where the probabilities of change where higher
+                print("",get_index_value(feature_QE - compressed_feature_np_flat))
 
         recon_image = self.Decoder(compressed_feature_renorm)
         # recon_image = prediction + recon_res
