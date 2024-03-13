@@ -17,6 +17,8 @@ sys.path.append("../quantization_error/")
 from embedding_simulator import Embedding_simulator as es
 from math import log
 import matplotlib.pyplot as plt
+sys.path.append("../Tools/")
+from my_utils import plot_tensor
 
 def save_model(model, iter, name):
     torch.save(model.state_dict(), os.path.join(name, "iter_{}.pth.tar".format(iter)))
@@ -145,9 +147,9 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
     def forward(self, input_image, stega=False, plot_hist=False, return_modification_rate=False, print_positive_proba=False):
         quant_noise_feature = torch.zeros(input_image.size(0), self.out_channel_N, input_image.size(2) // 16, input_image.size(3) // 16).cuda()
         quant_noise_feature = torch.nn.init.uniform_(torch.zeros_like(quant_noise_feature), -0.5, 0.5)
-        feature = self.Encoder(input_image)
+        feature = self.Encoder(input_image) # unquantized coefficients
         batch_size = feature.size()[0]
-        compressed_feature_renorm = torch.round(feature)
+        compressed_feature_renorm = torch.round(feature) # quantized coefficients
 
         if stega:
             shape = compressed_feature_renorm.shape[1:]
@@ -184,6 +186,19 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
             compressed_feature_np_flat = compressed_feature_renorm.cpu().numpy().flatten()
             feature_QE = es.process(compressed_feature_np_flat,p_change_P1,p_change_M1) # flattened coefficients in latent space with modification using quantization error
             compressed_feature_renorm[0] = torch.Tensor(feature_QE).reshape(shape[0],shape[1],shape[2])
+
+            # psnr between precover and stego
+            # pseudo_cover_feature = torch.round(feature).cpu().numpy().flatten() # where cover != stego we take unquantized coefficients
+            # pseudo_cover_feature[pseudo_cover_feature != feature_QE] = feature.cpu().numpy().flatten()[pseudo_cover_feature != feature_QE]
+            # pseudo_cover = torch.zeros_like(compressed_feature_renorm)
+            # pseudo_cover[0] = torch.Tensor(pseudo_cover_feature).reshape(shape[0],shape[1],shape[2])
+            # pseudo_cover_img = self.Decoder(pseudo_cover)
+            # stego_img = self.Decoder(compressed_feature_renorm)
+            # plot_tensor(pseudo_cover_img,"pseudo cover")
+            # plot_tensor(stego_img,"stego")
+            # mse = torch.mean((pseudo_cover_img - stego_img)**2)
+            # psnr = 10 * torch.log(1./mse) / np.log(10)
+            # print("psnr = ",psnr)
             
             if print_positive_proba: 
                 # print all > 0 probabilities of change (+1 or -1)
