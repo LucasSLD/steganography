@@ -51,8 +51,8 @@ def main(args):
         #     if checkpoint['hyper_parameters']['sca_layers']:
         #         model.net.sca_layers = checkpoint['hyper_parameters']['sca_layers']
         #     model.net = getattr(models, checkpoint['hyper_parameters']['surgery'])(model.net)
-        # model.net.load_state_dict({k.split('net.')[-1]: v for k,v in checkpoint['state_dict'].items()})
-        model.net.load_state_dict(checkpoint)
+        model.net.load_state_dict({k.split('net.')[-1]: v for k,v in checkpoint['state_dict'].items()})
+        # model.net.load_state_dict(checkpoint["state_dict"])
 
     # if args.surgery is not None:
     #     model.net.in_channels = args.in_channels
