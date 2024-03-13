@@ -23,7 +23,15 @@ def plot_tensor(tensor, title : str = None, colorbar=False,figsize=None):
         return
     plot_np_array(array, title, colorbar, figsize)
 
-def read_pgm(file_name):
+def read_pgm(file_name: str) -> np.ndarray:
+    """Reads pgm file and convert its content into numpy image
+
+    Args:
+        file_name (str): path
+
+    Returns:
+        np.ndarray: numpy array representing a grayscale image
+    """
     with open(file_name, 'rb') as f:
         # Skip header
         f.readline()
@@ -47,6 +55,14 @@ def ternary_entropy(p: float) -> float:
     return -2*p*log(p,2) - (1-2*p)*log(1-2*p,2)
 
 def pgm_to_tensor(file: str):
+    """Reads a pgm file and converts it into a tensor that can be fed to ImageCompressor
+
+    Args:
+        file (str): path to the pgm file
+
+    Returns:
+        Tensor: pgm imaged converted to usable tensor 
+    """
     precover = read_pgm(file)
     return to_tensor(precover).repeat(1,3,1,1).cuda()
 
