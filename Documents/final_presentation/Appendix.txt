@@ -1,0 +1,9 @@
+I   - Introduction
+    I.1 General context
+    I.2 Objectives
+II  - AI image compression
+    II.1 The idea (iclr 17 paper)
+    II.2 github repo
+III - Steganography & Steganalysis
+    III.1 
+IV  - 

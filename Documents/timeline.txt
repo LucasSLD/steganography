@@ -33,3 +33,6 @@
 
 Training : have 25% error with naive insertion, 20-50 epochs (install tensor board)
 
+Fevrier - Mars:
+	- implémentation de l'insertion avec quantization error
+	- transfer learning sur dataset généré par ImageCompressorStagenaography_QE

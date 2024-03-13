@@ -37,3 +37,5 @@ Implémenter la méthode d'insertion avec l'erreur de quantification.
 -> train JinSRNet on nex generated datasets
 
 next meeting: 7 mars 13h30
+
+next meeting: vendredi 15 mars 10 a.m.
