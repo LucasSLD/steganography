@@ -140,9 +140,50 @@ def apply_qe_to_bossbase_img(
         if plot_cover_stego:
             plot_tensor(cover_t,"cover")
             plot_tensor(stego_t,"stego")
-        mse_loss = torch.mean((cover_t - stego_t).pow(2))
+        mse_loss = torch.mean((img_t - stego_t).pow(2))
         psnr = 10 * (torch.log(1. / mse_loss) / np.log(10))
         diff = diff_cover_stego(cover_t,stego_t)[:,:,0] # we work with grayscale img so only 1 channel is necessary
         if plot_diff:
             plot_np_array(diff,title="cover - stego",colorbar=True,figsize=figsize)
         return psnr.cpu().numpy(), diff, modification_rate
+
+def apply_naive_to_bossbase_img(
+    precover_folder_path : str,
+    model_path : str,
+    idx: int,
+    p : float = 0.,
+    plot_cover_stego=False,
+    plot_diff=False,
+    figsize=None):
+    """Apply ImageCompressorSteganography to an image from bossbase
+
+    Args:
+        precover_folder_path (str): path to bossbase pgm images folder
+        model_path (str): path to the weights of the model
+        idx (int): number in the name of the pgm file to which we apply the model
+        p (float, optional): half insertion rate (used to get the size of the message). Defaults to 0..
+        plot_cover_stego (bool, optional): _description_. Defaults to False.
+        plot_diff (bool, optional): _description_. Defaults to False.
+
+    Returns:
+        _type_: _description_
+    """
+    with torch.no_grad():
+        model = ImageCompressorSteganography(p)
+        load_model(model,model_path)
+        net = model.cuda()
+        net.eval()
+        
+        img_t = pgm_to_tensor(precover_folder_path + "/" + str(idx) + ".pgm")
+        cover_t, _, _ = net(img_t,stega=False)
+        stego_t, _, _ = net(img_t,stega=True)
+
+        if plot_cover_stego:
+            plot_tensor(cover_t,"cover")
+            plot_tensor(stego_t,"stego")
+        mse_loss = torch.mean((img_t - stego_t).pow(2))
+        psnr = 10 * (torch.log(1. / mse_loss) / np.log(10))
+        diff = diff_cover_stego(cover_t,stego_t)[:,:,0] # we work with grayscale img so only 1 channel is necessary
+        if plot_diff:
+            plot_np_array(diff,title="cover - stego",colorbar=True,figsize=figsize)
+        return psnr.cpu().numpy(), diff
