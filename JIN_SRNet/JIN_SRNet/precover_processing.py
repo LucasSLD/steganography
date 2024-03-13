@@ -1,5 +1,6 @@
 import sys
 sys.path.append("../../iclr_17_compression/")
+sys.path.append("../../quantization_error/")
 from model import ImageCompressor, ImageCompressorSteganography
 from torchvision import transforms
 from PIL import Image
