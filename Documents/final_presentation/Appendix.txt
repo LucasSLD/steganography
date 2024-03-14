@@ -3,7 +3,28 @@ I   - Introduction
     I.2 Objectives
 II  - AI image compression
     II.1 The idea (iclr 17 paper)
-    II.2 github repo
-III - Steganography & Steganalysis
-    III.1 
-IV  - 
+    II.2 Implementation of the paper
+    II.3 Training of the model (generation of the dataset + training)
+III - Steganography
+    III.1 What is steganography
+    III.2 Naive insertion method
+        III.2.1 The idea
+        III.2.2 Implementation
+    III.3 Side information: quantization error
+        III.3.1 The idea
+        III.3.2 Implementation
+IV  - Steganalysis
+    IV.1 What is steganalysis
+    IV.2 Basic approach: looking at the images
+    IV.3 JIN SRnet
+        IV.3.1 The model
+        IV.3.2 Generating cover and stego datasets (boss base, manipulating pgm,...)
+        IV.3.3 Fine tuning the pretrained model
+    IV.4 Results
+        IV.4.1 Naive insertion
+        IV.4.2 Quantization error
+        IV.4.3 Comparison
+
+V   - Conclusion
+
+VI  - References
