@@ -1,21 +1,19 @@
 I   - Introduction
     I.1 General context
     I.2 Objectives
+    I.3 Steganograhy and steganalysis
 II  - AI image compression
     II.1 The idea (iclr 17 paper)
-    II.2 Implementation of the paper
-    II.3 Training of the model (generation of the dataset + training)
+    II.2 Training of the model (generation of the dataset + training)
 III - Steganography
-    III.1 What is steganography
     III.2 Naive insertion method
         III.2.1 The idea
-        III.2.2 Implementation
+        III.2.2 Implementation (and visual impact on the image)
     III.3 Side information: quantization error
         III.3.1 The idea
-        III.3.2 Implementation
+        III.3.2 Implementation (and visual impact on the image)
+        III.3.3 Modifying the cost
 IV  - Steganalysis
-    IV.1 What is steganalysis
-    IV.2 Basic approach: looking at the images
     IV.3 JIN SRnet
         IV.3.1 The model
         IV.3.2 Generating cover and stego datasets (boss base, manipulating pgm,...)
@@ -23,8 +21,19 @@ IV  - Steganalysis
     IV.4 Results
         IV.4.1 Naive insertion
         IV.4.2 Quantization error
-        IV.4.3 Comparison
+        IV.4.3 Modifying the cost
 
-V   - Conclusion
+V   - Conclusion (everything that has been learned on this project + perspectives -> playing with the cost)
 
 VI  - References
+
+ref:
+
+SRNet definition:
+Liu L, Tang L, Zheng W. Lossless Image Steganography Based on Invertible Neural Networks. Entropy (Basel). 2022 Dec 1;24(12):1762. doi: 10.3390/e24121762. PMID: 36554167; PMCID: PMC9777640.
+
+JIN SRNet:
+Revisiting Perturbed Quantization
+Butora, J., & Fridrich, J.
+9th IH&MMSec. Workshop 2021
+

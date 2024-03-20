@@ -1,0 +1,76 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{stmaryrd} %for special brackets
+\usepackage{lipsum}
+\usepackage{graphicx}
+\graphicspath{Images}
+\usepackage[hidelinks]{hyperref}
+\usepackage{array}
+\usepackage{bm} %for bold in math equations
+\usepackage{float} %to force the position of some figures
+\usepackage{biblatex}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\title{Report}
+\author{Lucas SALAND}
+\date{\today}
+
+\begin{document}
+\section*{Introduction}
+
+\section{AI image compression}
+\subsection{Autoencoder and latent space}
+The idea behind AI image compression is to have a compact representation of images using deep learning. To do so, we can use an autoencoder. The encoder part is used to obtain a representation of images in latent space. The coefficients of this representation is then quantized. We can then reconstruct a quantized image by feeding the quantized latent representation to the decoder part of the autoencoder. The training is done by optimizing the weighted sum of the rate and distortion.
+\begin{figure}[H]
+    \centering
+    \includegraphics*[width=.6\textwidth]{./img/transform_coding.png}
+    \caption[short]{$x$: uncompressed image, $y$: latent representation of $x$, $\hat{y}$: quantized latent representation of $x$, $\hat{x}$ reconstructed image}
+\end{figure}
+Compressed images obtained with the autoencoder approach are smoother than the ones obtained with JPEG.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{./img/jpeg_ai.png}
+    \caption[short]{AI compression vs JPEG compression}
+\end{figure}
+
+A pytorch implementation of this idea was provided by the iclr\_17\_compression repository available on Github. Nevertheless, no model checkpoint nor training data were provided.
+
+
+\subsection{Training the model}
+The generation of the training data was done using a script provided on the github repository. With this script, 80G of training data are generated. Once the training data has been generated, the training of the model can be started. The model used in all other experiments in this report has been trained over 1590000 steps across 6 epochs.
+\todo[inline]{add an image of the result of the compression with trained model on an image from kodak}
+
+\section{Steganography}
+\subsection{Naive insertion method}
+\subsubsection{Least significant bit modification}
+The least significant bit modification consists in adding or substracting 1 to coefficients of the latent representation with a given probability. For every coefficient, we sample a multivaria
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{./img/naive_insertion.png}
+    \caption[short]{diagram of the probabilities of modification of coefficients}
+\end{figure}
+The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient.
+\subsubsection{Implementation}
+
+\subsection{Side information: quantization error}
+\subsubsection{Non-constant probability of modification}
+\subsubsection{Implementation (and visual impact on image)}
+\subsubsection{Modifying the cost}
+
+\section{Steganalysis}
+\subsection{JIN SRNet}
+Steganography detector based on deep convolutional neural network, pretrained on ImageNet database
+\subsubsection{Generating cover and stego datasets}
+
+\subsubsection{Fine tuning the pretrained model}
+
+\subsection{Results}
+\subsubsection{Naive insertion}
+\subsubsection{Side information}
+\subsubsection{Modified cost}
+
+\section*{Conclusion}
+
+\section*{References}
+\end{document}
