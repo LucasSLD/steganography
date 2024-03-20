@@ -39,3 +39,19 @@ Implémenter la méthode d'insertion avec l'erreur de quantification.
 next meeting: 7 mars 13h30
 
 next meeting: vendredi 15 mars 10 a.m.
+
+1) increase the payload
+2) use pair constraint and divide by 2 the batch size
+for fine tuning remove pair constraint
+
+size of the file/nb_pixels_image
+
+Embedding on JPeg with same coding rate (bpp) and same message size
+Comparison between embeding in Latent space and in DCT
+
+Alternative plan: no comparison with jpeg, play with the cost
+1+e for -1, e for 0, 1-e for +1
+-> modify the script from process and send it for verification
+we will embed a message and minimize the distortion between precover/stego
+
+next meeting: 4pm Friday 22 march
