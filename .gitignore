@@ -1,4 +1,5 @@
 # Custom Ignores
+*/final_presentation/img/*
 *stego/
 *Images/
 *checkpoints/
