@@ -247,7 +247,7 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
 
 class ImageCompressorSteganography_QE_modified_cost(nn.Module): # Image compressor model with steganography performed with quantization error method and non-zero cost for adding 0 to quantized coefficients
     def __init__(self, p=0.0, out_channel_N=128):
-        super(ImageCompressorSteganography_QE, self).__init__()
+        super(ImageCompressorSteganography_QE_modified_cost, self).__init__()
         self.Encoder = Analysis_net_17(out_channel_N=out_channel_N)
         self.Decoder = Synthesis_net_17(out_channel_N=out_channel_N)
         self.bitEstimator = BitEstimator(channel=out_channel_N)
