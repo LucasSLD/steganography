@@ -113,7 +113,9 @@ def apply_qe_to_bossbase_img(
     p : float = 0.,
     plot_cover_stego=False,
     plot_diff=False,
-    figsize=None):
+    figsize=None,
+    use_modified_cost: bool=False,
+    plot_hist: bool=False):
     """Apply ImageCompressorSteganography_QE to an image from bossbase
 
     Args:
@@ -128,14 +130,18 @@ def apply_qe_to_bossbase_img(
         _type_: _description_
     """
     with torch.no_grad():
-        model = ImageCompressorSteganography_QE(p)
+        if use_modified_cost:
+            model = ImageCompressorSteganography_QE_modified_cost(p)
+        else:
+            model = ImageCompressorSteganography_QE(p)
+
         load_model(model,model_path)
         net = model.cuda()
         net.eval()
         
         img_t = pgm_to_tensor(precover_folder_path + "/" + str(idx) + ".pgm")
         cover_t, _, _ = net(img_t,stega=False)
-        stego_t, _, _, modification_rate = net(img_t,stega=True,return_modification_rate=True,print_positive_proba=True)
+        stego_t, _, _, modification_rate = net(img_t,stega=True,return_modification_rate=True,print_positive_proba=True,plot_hist=plot_hist)
 
         if plot_cover_stego:
             plot_tensor(cover_t,"cover")
