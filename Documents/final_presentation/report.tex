@@ -38,23 +38,45 @@ A pytorch implementation of this idea was provided by the iclr\_17\_compression 
 
 
 \subsection{Training the model}
-The generation of the training data was done using a script provided on the github repository. With this script, 80G of training data are generated. Once the training data has been generated, the training of the model can be started. The model used in all other experiments in this report has been trained over 1590000 steps across 6 epochs.
-\todo[inline]{add an image of the result of the compression with trained model on an image from kodak}
+The generation of the training data was done using a script provided on the github repository. With this script, 80G of training data are generated. Once the training data has been generated, the training of the model can be started. The model used in all other experiments in this report has been trained over 1590000 steps across 6 epochs. The base models from which all other model in this project are derived from is called ImageCompressor.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{./img/ImageCompressor.png}
+    \caption[short]{ImageCompressor model}
+\end{figure}
 
 \section{Steganography}
 \subsection{Naive insertion method}
 \subsubsection{Least significant bit modification}
-The least significant bit modification consists in adding or substracting 1 to coefficients of the latent representation with a given probability. For every coefficient, we sample a multivaria
+The least significant bit modification consists in adding or substracting 1 to quantized coefficients of the latent representation with a given probability. We can model the modification as follows:
+
+\begin{itemize}
+    \item $c_i: \text{quantized coefficient in the latent space}$
+    \item $\mathcal{E}
+    _i \sim Categorical_{\{-1,0,1\}},\\
+    \ \mathbb{P}(\mathcal{E}_i = -1) = \mathbb{P}(\mathcal{E}_i = 1) = p,\\
+    \mathbb{P}(\mathcal{E}_i = 0) = 1-2p$ 
+    \item $\hat{C}_i = c_i + \mathcal{E}_i \sim Categorical_{\{c_i-1,\ c_i,\ c_i+1\}}:$ quantized coefficient after modification
+\end{itemize}
+
+For each coeffcient $c_i$ we sample a realization $\epsilon_i$ of $\mathcal{E}_i$ and obtain the modified version of this coefficient $\hat{c_i}$ which is a realization of $\hat{C_i}$.\\
+The image reconstructed from the original latent representation is called the \textbf{cover} whereas the one reconstructed from the modified latent representation is called the \textbf{stego}.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{./img/naive_insertion.png}
     \caption[short]{diagram of the probabilities of modification of coefficients}
+    \label{fig:probabilities}
 \end{figure}
-The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient.
+The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient. The size of the message we embbed is given by size = number coefficients in latent space * insertion rate.
 \subsubsection{Implementation}
+The insertion is done on the quantized coefficients in latent space. Thus, a new model ImageCompressorSteganography based on ImageCompressor contains the necessary steps to perform the insertion given a probability p (see \autoref{fig:probabilities}). The first implementation of the LSB modification was implemented using 3 for-loops. Due to low performances of python for-loops, a new implementation was done using pytorch's multinomial method, enabling computations to be performed 30 times faster by taking advantage of GPU's computational power.
 
 \subsection{Side information: quantization error}
+The LSB modification is a very basic approach to perform steganography. It's simplicity makes it easy to detect. Every coeffcient in the latent representation has the same probability of modifications. To make it less detectable, we can use the quantization error: the difference between original coefficients and quantized coefficients in latent space. The goal is to give higher probability of modification where the quantization error is important and smaller probabilities where the quantization error is close to zero.  
 \subsubsection{Non-constant probability of modification}
+To obtain the different probabilities of modification for each coefficient, an optimization problem under constraint must be solved.
+
 \subsubsection{Implementation (and visual impact on image)}
 \subsubsection{Modifying the cost}
 
