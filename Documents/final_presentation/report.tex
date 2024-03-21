@@ -75,7 +75,12 @@ The insertion is done on the quantized coefficients in latent space. Thus, a new
 \subsection{Side information: quantization error}
 The LSB modification is a very basic approach to perform steganography. It's simplicity makes it easy to detect. Every coeffcient in the latent representation has the same probability of modifications. To make it less detectable, we can use the quantization error: the difference between original coefficients and quantized coefficients in latent space. The goal is to give higher probability of modification where the quantization error is important and smaller probabilities where the quantization error is close to zero.  
 \subsubsection{Non-constant probability of modification}
-To obtain the different probabilities of modification for each coefficient, an optimization problem under constraint must be solved.
+To obtain different probabilities of modification for each coefficient, an optimization problem under constraint must be solved, the unknown is $\lambda$:
+\begin{itemize}
+    \item $\forall i \in \llbracket 1, \# coef \rrbracket,\ \forall k \in \{-1,\ 0,\ 1 \},\ p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{e^{-\lambda c_{i,-1}} + e^{-\lambda c_{i,0}} + e^{-\lambda c_{i,1}}}$, probability to add k to the i-th coefficient
+    \item $\displaystyle\sum_{i=1}^{\# coef}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$, where M is the size of the message to embbed
+\end{itemize}
+This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas.
 
 \subsubsection{Implementation (and visual impact on image)}
 \subsubsection{Modifying the cost}
