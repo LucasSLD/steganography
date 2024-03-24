@@ -4,7 +4,7 @@ import numpy as np
 import h5py
 
 from utils import Utils
-
+import pdb
 """
 Tools for steganographic algorithms
 """
@@ -129,6 +129,7 @@ class Embedding_simulator():
             lbd = l1 + (l3 - l1) / 2 # dichotomy
             pP1 = np.exp(-lbd * rhoP1) / (1 + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
             pM1 = np.exp(-lbd * rhoM1) / (1 + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
+
             m2 = Embedding_simulator.ternary_entropy(pP1, pM1) # total entropy new calculation
             if m2 < message_length: # classical ternary search
                 l3 = lbd
@@ -141,7 +142,7 @@ class Embedding_simulator():
 
     @staticmethod
     def calc_lambda_0(rhoP1, rhoM1, rho0, message_length, n):
-        l3 = 1000 # just an initial value
+        l3 = 10 # just an initial value
         m3 = message_length + 1 # to enter at least one time in the loop, just an initial value
                                 # m3 is the total entropy
         iterations = 0 # iterations counter
@@ -151,8 +152,10 @@ class Embedding_simulator():
             Stop when total entropy < message_length
             """
             l3 *= 2
-            pP1 = np.exp(-l3 * rhoP1) / (np.exp(-l3 * rho0) + np.exp(-l3 * rhoP1) + np.exp(-l3 * rhoM1))
-            pM1 = np.exp(-l3 * rhoM1) / (np.exp(-l3 * rho0) + np.exp(-l3 * rhoP1) + np.exp(-l3 * rhoM1))
+            # pP1 = np.exp(-l3 * rhoP1) / (np.exp(-l3 * rho0) + np.exp(-l3 * rhoP1) + np.exp(-l3 * rhoM1))
+            # pM1 = np.exp(-l3 * rhoM1) / (np.exp(-l3 * rho0) + np.exp(-l3 * rhoP1) + np.exp(-l3 * rhoM1))
+            pP1 = 1 / (1 + np.exp(-l3 * (rhoM1-rhoP1)) + np.exp(-l3* (rho0 - rhoP1)))
+            pM1 = 1 / (1 + np.exp(-l3 * (rhoP1 - rhoM1)) + np.exp(-l3 * (rho0 - rhoM1)))
             # Total entropy
             m3 = Embedding_simulator.ternary_entropy(pP1, pM1)
             iterations += 1
@@ -163,6 +166,7 @@ class Embedding_simulator():
                 doesn't work here
                 """
                 lbd = l3
+                print("iterations",iterations)
                 return lbd
 
 
@@ -174,10 +178,12 @@ class Embedding_simulator():
         # Limit search to 30 iterations
         # Require that relative payload embedded is roughly within
         # 1/1000 of the required relative payload
-        while (m1 - m3) / n > alpha / 1000 and iterations < 30:
+        while (m1 - m3) / n > alpha / 1000 and iterations < 50:
             lbd = l1 + (l3 - l1) / 2 # dichotomy
-            pP1 = np.exp(-lbd * rhoP1) / (np.exp(-l3 * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
-            pM1 = np.exp(-lbd * rhoM1) / (np.exp(-l3 * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
+            # pP1 = np.exp(-lbd * rhoP1) / (np.exp(-l3 * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
+            pP1 = 1 / (1 + np.exp(-lbd * (rhoM1-rhoP1)) + np.exp(-lbd * (rho0 - rhoP1)))
+            pM1 = 1 / (1 + np.exp(-lbd * (rhoP1 - rhoM1)) + np.exp(-lbd * (rho0 - rhoM1)))
+            # pdb.set_trace()
             m2 = Embedding_simulator.ternary_entropy(pP1, pM1) # total entropy new calculation
             if m2 < message_length: # classical ternary search
                 l3 = lbd
@@ -186,6 +192,7 @@ class Embedding_simulator():
                 l1 = lbd
                 m1 = m2
             iterations += 1 # for monitoring the number of iterations
+        print("iterations",iterations)
         return lbd
 
     @staticmethod
@@ -223,8 +230,10 @@ class Embedding_simulator():
         The cost of not modifying the quantized coefficient is not 0
         """
         lbd = Embedding_simulator.calc_lambda_0(rhoP1, rhoM1, rho0, message_length, n)
-        p_change_P1 = np.exp(-lbd * rhoP1) / (np.exp(-lbd * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
-        p_change_M1 = np.exp(-lbd * rhoM1) / (np.exp(-lbd * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
+        # p_change_P1 = np.exp(-lbd * rhoP1) / (np.exp(-lbd * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
+        # p_change_M1 = np.exp(-lbd * rhoM1) / (np.exp(-lbd * rho0) + np.exp(-lbd * rhoP1) + np.exp(-lbd * rhoM1))
+        p_change_P1 = 1 / (1 + np.exp(-lbd * (rhoM1-rhoP1)) + np.exp(-lbd * (rho0 - rhoP1)))
+        p_change_M1 = 1 / (1 + np.exp(-lbd * (rhoP1 - rhoM1)) + np.exp(-lbd * (rho0 - rhoM1)))
         return p_change_P1, p_change_M1
 
     @staticmethod
