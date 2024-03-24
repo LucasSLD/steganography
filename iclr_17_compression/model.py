@@ -167,6 +167,16 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
                 plt.title("Quantization error histogram")
                 plt.show()
                 
+                plt.hist(rho_P1,50)
+                plt.yscale("log")
+                plt.title("rhoP1")
+                plt.show()
+
+                plt.hist(rho_M1,50)
+                plt.yscale("log")
+                plt.title("rhoM1")
+                plt.show()
+
                 plt.hist(p_change_M1,50)
                 plt.grid()
                 plt.title("Histogram of -1 probabilities")
@@ -269,16 +279,31 @@ class ImageCompressorSteganography_QE_modified_cost(nn.Module): # Image compress
             qe_np  = quantization_error.cpu().numpy()
             rho_P1 = 1 - qe_np
             rho_M1 = 1 + qe_np
-            rho_0  = qe_np
+            rho_0  = np.abs(qe_np)
             p_change_P1, p_change_M1 = es.compute_proba_0(rho_P1,rho_M1,rho_0,message_length,shape[0]*shape[1]*shape[2])
             
             if plot_hist:
-                plt.hist(quantization_error.cpu().numpy(),50)
-                plt.grid()
-                plt.yscale("log")
-                plt.title("Quantization error histogram")
-                plt.show()
+                # plt.hist(quantization_error.cpu().numpy(),50)
+                # plt.grid()
+                # plt.yscale("log")
+                # plt.title("Quantization error histogram")
+                # plt.show()
                 
+                plt.hist(rho_P1,50)
+                plt.yscale("log")
+                plt.title("rhoP1")
+                plt.show()
+
+                plt.hist(rho_M1,50)
+                plt.yscale("log")
+                plt.title("rhoM1")
+                plt.show()
+
+                plt.hist(rho_0,50)
+                plt.yscale("log")
+                plt.title("rho0")
+                plt.show()
+
                 plt.hist(p_change_M1,50)
                 plt.grid()
                 plt.title("Histogram of -1 probabilities")
