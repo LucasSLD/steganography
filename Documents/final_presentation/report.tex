@@ -31,7 +31,7 @@ Compressed images obtained with the autoencoder approach are smoother than the o
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{./img/jpeg_ai.png}
-    \caption[short]{AI compression vs JPEG compression}
+    \caption[short]{AI compression vs JPEG compression (End To End Image Compression paper)}
 \end{figure}
 
 A pytorch implementation of this idea was provided by the iclr\_17\_compression repository available on Github. Nevertheless, no model checkpoint nor training data were provided.
@@ -73,7 +73,7 @@ The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bi
 The insertion is done on the quantized coefficients in latent space. Thus, a new model ImageCompressorSteganography based on ImageCompressor contains the necessary steps to perform the insertion given a probability p (see \autoref{fig:probabilities}). The first implementation of the LSB modification was implemented using 3 for-loops. Due to low performances of python for-loops, a new implementation was done using pytorch's multinomial method, enabling computations to be performed 30 times faster by taking advantage of GPU's computational power.
 
 \subsection{Side information: quantization error}
-The LSB modification is a very basic approach to perform steganography. It's simplicity makes it easy to detect. Every coeffcient in the latent representation has the same probability of modifications. To make it less detectable, we can use the quantization error: the difference between original coefficients and quantized coefficients in latent space. The goal is to give higher probability of modification where the quantization error is important and smaller probabilities where the quantization error is close to zero.  
+The LSB modification is a very basic approach to perform steganography. Its simplicity makes it easy to detect. Every coeffcient in the latent representation has the same probability of modifications. To make it less detectable, we can use the quantization error: the difference between original coefficients and quantized coefficients in latent space. The goal is to give higher probability of modification where the quantization error is important and smaller probabilities where the quantization error is close to zero.  
 \subsubsection{Non-constant probability of modification}
 To obtain different probabilities of modification for each coefficient, an optimization problem under constraint must be solved, the unknown is $\lambda$:
 \begin{itemize}
