@@ -11,13 +11,22 @@
 \usepackage{float} %to force the position of some figures
 \usepackage{biblatex}
 \usepackage[colorinlistoftodos]{todonotes}
+\usepackage{multirow}
+\usepackage{multicol}
 
 \title{Report}
 \author{Lucas SALAND}
 \date{\today}
 
 \begin{document}
-\section*{Introduction}
+\input{title_page.tex}
+\tableofcontents
+\todo[inline]{table of figures}
+\todo[inline]{table of tables}
+\section{Introduction}
+Communication is crucial in our civilization. There are many ways to communicate and transmit information nowadays. The rise of information technology in the past decades enabled more communication than ever before in many different forms: images, texts, videos, audios\dots Information is encoded in a specific way for each type of information. And even for a same type of media such as images, there exist different formats in which information can be encoded. What can be done when hidden communication is needed on a transmission channel that other might have access to? A first idea could be to use encryption to hide the meaning of the messsage, the presence of the message is known, its meaning is unknown.  A second idea is to hide the message to be transmitted in another piece of content and transmit it without raising suspicions about the modified piece of content. This is called steganography. The original piece of content is called a cover. Once the hidden message has been embedded, it becomes the stego. Steganography is often paired with steganalysis. The goal of steganalysis is to detect whether a message was hidden in a given piece of content. In this project, we were interested in steganography performed on AI-compressed images.\\
+There exists many papers on steganography performed on JPEG images but none explored yet steganography on AI-compressed images. Images can be represented in many different spaces: RGB, DCT (JPEG), YCbCr, HSV/HSL... The first step of steganography on images is to chose on which representation of images we want to embbed the message. AI-compressed images have their own representation.\\
+Using deep learning for image compression was first introduced in "End-To-End Optimized Image Compression". This paper developed the idea of using convolutional neural network to obtain a representation of images in a latent space. This representation in latent space is the one on which steganography will be performed. Modern steganalysis on images relies on neural network detectors. In this project, we use SRNet to perform classification of images with classes "stego" and "cover".
 
 \section{AI image compression}
 \subsection{Autoencoder and latent space}
@@ -41,14 +50,20 @@ A pytorch implementation of this idea was provided by the iclr\_17\_compression 
 The generation of the training data was done using a script provided on the github repository. With this script, 80G of training data are generated. Once the training data has been generated, the training of the model can be started. The model used in all other experiments in this report has been trained over 1590000 steps across 6 epochs. The base models from which all other model in this project are derived from is called ImageCompressor.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{./img/ImageCompressor.png}
+    \includegraphics[width=.8\textwidth]{./img/ImageCompressor.png}
     \caption[short]{ImageCompressor model}
 \end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{img/Original_reconstructed.png}
+    \caption[short]{Input \& output of ImageCompressor model}
+\end{figure}
+
 \section{Steganography}
-\subsection{Naive insertion method}
-\subsubsection{Least significant bit modification}
-The least significant bit modification consists in adding or substracting 1 to quantized coefficients of the latent representation with a given probability. We can model the modification as follows:
+\subsection{Naive method: LSB replacement}
+\subsubsection{Least significant bit replacement}
+The least significant bit replacement consists in adding or substracting 1 to quantized coefficients of the latent representation with a given probability. We can model the modification as follows:
 
 \begin{itemize}
     \item $c_i: \text{quantized coefficient in the latent space}$
@@ -68,36 +83,66 @@ The image reconstructed from the original latent representation is called the \t
     \caption[short]{diagram of the probabilities of modification of coefficients}
     \label{fig:probabilities}
 \end{figure}
-The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient. The size of the message we embbed is given by size = number coefficients in latent space * insertion rate.
+The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient. The size of the message we embbed is given by \[\text{size = number coefficients in latent space * insertion rate}\]
 \subsubsection{Implementation}
-The insertion is done on the quantized coefficients in latent space. Thus, a new model ImageCompressorSteganography based on ImageCompressor contains the necessary steps to perform the insertion given a probability p (see \autoref{fig:probabilities}). The first implementation of the LSB modification was implemented using 3 for-loops. Due to low performances of python for-loops, a new implementation was done using pytorch's multinomial method, enabling computations to be performed 30 times faster by taking advantage of GPU's computational power.
+The insertion is done on the quantized coefficients in latent space. Thus, a new model ImageCompressorSteganography based on ImageCompressor contains the necessary steps to perform the insertion given a probability p (see \autoref{fig:probabilities}). The first version of the LSB modification was implemented using 3 for-loops. Due to low performances of python for-loops, a new implementation was done using pytorch's multinomial method, enabling computations to be performed 30 times faster by taking advantage of GPU's computational power.
 
 \subsection{Side information: quantization error}
 The LSB modification is a very basic approach to perform steganography. Its simplicity makes it easy to detect. Every coeffcient in the latent representation has the same probability of modifications. To make it less detectable, we can use the quantization error: the difference between original coefficients and quantized coefficients in latent space. The goal is to give higher probability of modification where the quantization error is important and smaller probabilities where the quantization error is close to zero.  
-\subsubsection{Non-constant probability of modification}
+\subsubsection{Non-uniform probability of modification}
 To obtain different probabilities of modification for each coefficient, an optimization problem under constraint must be solved, the unknown is $\lambda$:
-\begin{itemize}
-    \item $\forall i \in \llbracket 1, \# coef \rrbracket,\ \forall k \in \{-1,\ 0,\ 1 \},\ p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{e^{-\lambda c_{i,-1}} + e^{-\lambda c_{i,0}} + e^{-\lambda c_{i,1}}}$, probability to add k to the i-th coefficient
-    \item $\displaystyle\sum_{i=1}^{\# coef}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$, where M is the size of the message to embbed
-\end{itemize}
-This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas.
 
-\subsubsection{Implementation (and visual impact on image)}
+\begin{center}
+\begin{tabular}{ |c|c|c| }
+    \hline
+    &  & Comments\\
+    \hline
+    & $e_i = \text{coef}_i - \text{quantized\_coef}_i$ & quantization error on the i-th coefficient\\ 
+    & $c_{i,-1} = 1 + 2e_i$ & cost of -1 modification\\ 
+    Notations & $c_{i,0} = 0$ & no penalization\\
+    & $c_{i,1} = 1 - 2e_i$ & cost of +1 modification\\
+    & $p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{e^{-\lambda c_{i,-1}} + e^{-\lambda c_{i,0}} + e^{-\lambda c_{i,1}}}$ & probability of +k on coef i, k $\in$ \{-1,0,1\}\\
+    & $\lambda$ & variable of the problem\\
+    \hline
+    Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
+    \hline
+    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
+    \hline
+\end{tabular}
+\end{center}
+This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas. This code only works with 1-D numpy arrays.
+
+\subsubsection{Implementation}
+Tensor to np array -> flatten -> cost -> probabilities -> embedding -> reshape -> np array to Tensor 
+\todo[inline]{Detail more}
 \subsubsection{Modifying the cost}
-
+\todo[inline]{Complete this part}
 \section{Steganalysis}
 \subsection{JIN SRNet}
-Steganography detector based on deep convolutional neural network, pretrained on ImageNet database
+JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image. It is pretrained on ImageNet database. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payload for each method such that the prediction error is the same. 
 \subsubsection{Generating cover and stego datasets}
+To fine-tune the JINSRNet model, the first step is to generate cover and stego datasets. The original dataset used is BossBase. A dataset of 10 000 grayscaled images saved in pgm format. 
+\todo[inline]{Images of BossBase}
+The cover dataset is generated by feeding the 10 000 images from BossBase to ImageCompressor, the images are saved as .pt (pytorch tensors). For stego datasets, several where generated for each method. One dataset is generated per payload and per method used. Taking into consideration that Bossbase, cover and one stego dataset take 90GB of space on disk, it was not possible to store many versions of stego datasets at once. Thus, every time a new stego dataset was generated, the previous one was removed in order to save some space.\\
+For every method, the generation of the stego dataset is similar. The only difference is which variant of ImageCompressor model is used. The steps are the following:
+\begin{itemize}
+    \item read pgm files (original images from BossBase)
+    \item convert each file into a tensor as ImageCompressor-based models works with tensors
+    \item feed the tensor image to the ImageCompressor-based model corresponding to the method we want to use with the correct payload (ImageCompressorSteganography for LSB, ImageCompressorSteganography\_QE for side information and ImageCompressorSteganography\_QE\_modified\_cost for the variant of side information)
+    \item save the generated image as a tensor on disk
+\end{itemize}
 
-\subsubsection{Fine tuning the pretrained model}
+As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels in order to feed them to each model.
 
+\subsubsection{Fine-tuning the pretrained model}
+Once the datasets are generated. We can fine-tune JINSRNet
+Training script and pretrained model provided by Jan Butora.
 \subsection{Results}
 \subsubsection{Naive insertion}
 \subsubsection{Side information}
 \subsubsection{Modified cost}
 
-\section*{Conclusion}
+\section{Conclusion}
 
 \section*{References}
 \end{document}

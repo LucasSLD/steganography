@@ -6,22 +6,22 @@ II  - AI image compression
     II.1 The idea (iclr 17 paper)
     II.2 Training of the model (generation of the dataset + training)
 III - Steganography
-    III.2 Naive insertion method
+    III.1 Naive method: LSB replacement
+        III.1.1 The idea
+        III.1.2 Implementation (and visual impact on the image)
+    III.2 Side information: quantization error
         III.2.1 The idea
         III.2.2 Implementation (and visual impact on the image)
-    III.3 Side information: quantization error
-        III.3.1 The idea
-        III.3.2 Implementation (and visual impact on the image)
-        III.3.3 Modifying the cost
+        III.2.3 Modifying the cost
 IV  - Steganalysis
-    IV.3 JIN SRnet
-        IV.3.1 The model
-        IV.3.2 Generating cover and stego datasets (boss base, manipulating pgm,...)
-        IV.3.3 Fine tuning the pretrained model
-    IV.4 Results
-        IV.4.1 Naive insertion
-        IV.4.2 Quantization error
-        IV.4.3 Modifying the cost
+    IV.1 JIN SRnet
+        IV.1.1 The model
+        IV.1.2 Generating cover and stego datasets (boss base, manipulating pgm,...)
+        IV.1.3 Fine tuning the pretrained model
+    IV.2 Results
+        IV.2.1 Naive insertion
+        IV.2.2 Quantization error
+        IV.2.3 Modifying the cost
 
 V   - Conclusion (everything that has been learned on this project + perspectives -> playing with the cost)
 
