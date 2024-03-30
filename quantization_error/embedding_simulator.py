@@ -166,7 +166,6 @@ class Embedding_simulator():
                 doesn't work here
                 """
                 lbd = l3
-                print("iterations",iterations)
                 return lbd
 
 
@@ -192,7 +191,6 @@ class Embedding_simulator():
                 l1 = lbd
                 m1 = m2
             iterations += 1 # for monitoring the number of iterations
-        print("iterations",iterations)
         return lbd
 
     @staticmethod
