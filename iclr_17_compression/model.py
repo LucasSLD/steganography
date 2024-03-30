@@ -18,7 +18,6 @@ from embedding_simulator import Embedding_simulator as es
 from math import log
 import matplotlib.pyplot as plt
 sys.path.append("../Tools/")
-from my_utils import plot_tensor
 
 def save_model(model, iter, name):
     torch.save(model.state_dict(), os.path.join(name, "iter_{}.pth.tar".format(iter)))
@@ -162,7 +161,6 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
             
             if plot_hist:
                 plt.hist(quantization_error.cpu().numpy(),50)
-                plt.grid()
                 plt.yscale("log")
                 plt.title("Quantization error histogram")
                 plt.show()
@@ -178,13 +176,11 @@ class ImageCompressorSteganography_QE(nn.Module): # Image compressor model with 
                 plt.show()
 
                 plt.hist(p_change_M1,50)
-                plt.grid()
                 plt.title("Histogram of -1 probabilities")
                 plt.yscale("log")
                 plt.show()
                 
                 plt.hist(p_change_P1,50)
-                plt.grid()
                 plt.yscale("log")
                 plt.title("Histogram of +1 probabilities")
                 plt.show()
@@ -283,12 +279,6 @@ class ImageCompressorSteganography_QE_modified_cost(nn.Module): # Image compress
             p_change_P1, p_change_M1 = es.compute_proba_0(rho_P1,rho_M1,rho_0,message_length,shape[0]*shape[1]*shape[2])
             
             if plot_hist:
-                # plt.hist(quantization_error.cpu().numpy(),50)
-                # plt.grid()
-                # plt.yscale("log")
-                # plt.title("Quantization error histogram")
-                # plt.show()
-                
                 plt.hist(rho_P1,50)
                 plt.yscale("log")
                 plt.title("rhoP1")
@@ -305,13 +295,11 @@ class ImageCompressorSteganography_QE_modified_cost(nn.Module): # Image compress
                 plt.show()
 
                 plt.hist(p_change_M1,50)
-                plt.grid()
                 plt.title("Histogram of -1 probabilities")
                 plt.yscale("log")
                 plt.show()
                 
                 plt.hist(p_change_P1,50)
-                plt.grid()
                 plt.yscale("log")
                 plt.title("Histogram of +1 probabilities")
                 plt.show()
