@@ -13,6 +13,26 @@
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{multirow}
 \usepackage{multicol}
+\usepackage{listings}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    commentstyle=\itshape\color{purple!40!black},
+    keywordstyle=\bfseries\color{blue!70!black},
+    stringstyle=\color{green!60!black},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=single,
+    rulecolor=\color{black!20},
+    backgroundcolor=\color{gray!5},
+    tabsize=4,
+    captionpos=b
+}
 
 \title{Report}
 \author{Lucas SALAND}
@@ -92,7 +112,7 @@ The LSB modification is a very basic approach to perform steganography. Its simp
 \subsubsection{Non-uniform probability of modification}
 To obtain different probabilities of modification for each coefficient, an optimization problem under constraint must be solved, the unknown is $\lambda$:
 
-\begin{center}
+\begin{table}[H]
 \begin{tabular}{ |c|c|c| }
     \hline
     &  & Comments\\
@@ -109,7 +129,8 @@ To obtain different probabilities of modification for each coefficient, an optim
     Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
     \hline
 \end{tabular}
-\end{center}
+\caption[short]{Optimization problem to solve}
+\end{table}
 This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas. This code only works with 1-D numpy arrays.
 
 \subsubsection{Implementation}
@@ -133,10 +154,53 @@ For every method, the generation of the stego dataset is similar. The only diffe
 \end{itemize}
 
 As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels in order to feed them to each model.
+\todo[inline]{Talk about img\_saving.ipynb}
 
 \subsubsection{Fine-tuning the pretrained model}
-Once the datasets are generated. We can fine-tune JINSRNet
-Training script and pretrained model provided by Jan Butora.
+Once the datasets are generated. We can fine-tune JINSRNet.
+Training script and pretrained model were kindly provided by Jan Butora. Some adjustment were needed in order to load the training data as the original script loaded jpeg files. The class loading the data is called a retriever. We implemented a retriever that works with .pt files (pytorch tensors). The images saved as pytorch tensors are loaded and converted into numpy arrays. To convert pytorch images into numpy images there is two different methods. The first one consists in using the ToPILImage() function of pytorch which converts a pytorch tensor into a PIL image which we can then convert into a numpy array. The second method consists in permuting axis of the tensor to fit numpy convention for representation of images and then converting the tensor into a numpy array by using numpy() function of pytorch Tensor class. As we can see on \autoref{tab:torch2np}, the method of permuting axis and converting to NumPy using numpy() function is about 10 times faster than the other method. Thus this method is the one used for tensor to numpy array conversion.\\
+
+\begin{lstlisting}[caption={Conversion of pytorch tensors into numpy images}, label={lst:example}]
+to_pil = ToPILImage()
+# bad performance
+img_numpy = np.array(to_pil(img_pytorch[0]))
+
+# good performance
+img_numpy = img_pytorch[0].permute(1,2,0).cpu().numpy() 
+\end{lstlisting}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        ToPIL & numpy()\\
+        \hline
+        $5.15\ ms\ \pm\ 238 \mu s$  & $523 \mu s\ \pm\ 18.7 \mu s  $\\
+        \hline
+    \end{tabular}
+    \caption[short]{Performances comparison of tensor to numpy conversion}
+    \label{tab:torch2np}
+\end{table}
+
+\begin{table}[H]
+    \centering
+\begin{tabular}{|c|c|c|}
+    \hline
+    Axis & Pytorch & Numpy \\
+    \hline
+    0 & batch dimension & height \\
+    \hline
+    1 & channel & width\\
+    \hline
+    2 & height & channel\\
+    \hline
+    3 & width & $\emptyset$\\
+    \hline
+\end{tabular}    
+\caption[short]{Difference of image representation between NumPy and Pytorch}
+\end{table}
+
+
 \subsection{Results}
 \subsubsection{Naive insertion}
 \subsubsection{Side information}
