@@ -199,7 +199,7 @@ img_numpy = img_pytorch[0].permute(1,2,0).cpu().numpy()
 \end{tabular}    
 \caption[short]{Difference of image representation between NumPy and Pytorch}
 \end{table}
-
+The first fine-tuning training were done for the LSB replacement method. A stego dataset needs to be generated for each insertion rate. The first training was performed for an insertion rate of 1.5 bpc (bits per coefficient). Which is the highest insertion rate possible. At this rate, it is possible to draw distinction between cover and stego images just by looking at them. This training was done to make sure that JINSRnet could easily distinguish them. Once the first training was performed, the insertion rate was progressively decreased. The metric of interest was the prediction error on validation set. The goal was to find, for the LSB replacement method, an insertion rate such that the prediction error would be between 10\% ad 20\% in order to have some margin to see the improvment in performance with the side information method. This was done with the idea of comparing methods for a given insertion rate. We will see in the next section this comparison was not possible. Therefore, the other way of comparing methods has been prefered: finding different insertion rates for which all methods have similar prediction error.
 
 \subsection{Results}
 \subsubsection{Naive insertion}
