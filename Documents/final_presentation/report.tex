@@ -41,8 +41,8 @@
 \begin{document}
 \input{title_page.tex}
 \tableofcontents
-\todo[inline]{table of figures}
-\todo[inline]{table of tables}
+\listoffigures
+\listoftables
 \section{Introduction}
 Communication is crucial in our civilization. There are many ways to communicate and transmit information nowadays. The rise of information technology in the past decades enabled more communication than ever before in many different forms: images, texts, videos, audios\dots Information is encoded in a specific way for each type of information. And even for a same type of media such as images, there exist different formats in which information can be encoded. What can be done when hidden communication is needed on a transmission channel that other might have access to? A first idea could be to use encryption to hide the meaning of the messsage, the presence of the message is known, its meaning is unknown.  A second idea is to hide the message to be transmitted in another piece of content and transmit it without raising suspicions about the modified piece of content. This is called steganography. The original piece of content is called a cover. Once the hidden message has been embedded, it becomes the stego. Steganography is often paired with steganalysis. The goal of steganalysis is to detect whether a message was hidden in a given piece of content. In this project, we were interested in steganography performed on AI-compressed images.\\
 There exists many papers on steganography performed on JPEG images but none explored yet steganography on AI-compressed images. Images can be represented in many different spaces: RGB, DCT (JPEG), YCbCr, HSV/HSL... The first step of steganography on images is to chose on which representation of images we want to embbed the message. AI-compressed images have their own representation.\\
@@ -54,13 +54,13 @@ The idea behind AI image compression is to have a compact representation of imag
 \begin{figure}[H]
     \centering
     \includegraphics*[width=.6\textwidth]{./img/transform_coding.png}
-    \caption[short]{$x$: uncompressed image, $y$: latent representation of $x$, $\hat{y}$: quantized latent representation of $x$, $\hat{x}$ reconstructed image}
+    \caption[Representation of images]{$x$: uncompressed image, $y$: latent representation of $x$, $\hat{y}$: quantized latent representation of $x$, $\hat{x}$ reconstructed image}
 \end{figure}
 Compressed images obtained with the autoencoder approach are smoother than the ones obtained with JPEG.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{./img/jpeg_ai.png}
-    \caption[short]{AI compression vs JPEG compression (End To End Image Compression paper)}
+    \caption[AI compression vs JPEG]{AI compression vs JPEG compression (End To End Image Compression paper)}
 \end{figure}
 
 A pytorch implementation of this idea was provided by the iclr\_17\_compression repository available on Github. Nevertheless, no model checkpoint nor training data were provided.
@@ -71,13 +71,13 @@ The generation of the training data was done using a script provided on the gith
 \begin{figure}[H]
     \centering
     \includegraphics[width=.8\textwidth]{./img/ImageCompressor.png}
-    \caption[short]{ImageCompressor model}
+    \caption[ImageCompressor model]{ImageCompressor model}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{img/Original_reconstructed.png}
-    \caption[short]{Input \& output of ImageCompressor model}
+    \caption[Image uncompressed \& AI compressed]{Input \& output of ImageCompressor model}
 \end{figure}
 
 \section{Steganography}
@@ -100,7 +100,7 @@ The image reconstructed from the original latent representation is called the \t
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{./img/naive_insertion.png}
-    \caption[short]{diagram of the probabilities of modification of coefficients}
+    \caption[Diagram of the probabilities of modification of coefficients]{diagram of the probabilities of modification of coefficients}
     \label{fig:probabilities}
 \end{figure}
 The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient. The size of the message we embbed is given by \[\text{size = number coefficients in latent space * insertion rate}\]
@@ -129,7 +129,7 @@ To obtain different probabilities of modification for each coefficient, an optim
     Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
     \hline
 \end{tabular}
-\caption[short]{Optimization problem to solve}
+\caption[Optimization under constraints]{Optimization problem to solve}
 \end{table}
 This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas. This code only works with 1-D numpy arrays.
 
@@ -143,7 +143,13 @@ Tensor to np array -> flatten -> cost -> probabilities -> embedding -> reshape -
 JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image. It is pretrained on ImageNet database. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payload for each method such that the prediction error is the same. 
 \subsubsection{Generating cover and stego datasets}
 To fine-tune the JINSRNet model, the first step is to generate cover and stego datasets. The original dataset used is BossBase. A dataset of 10 000 grayscaled images saved in pgm format. 
-\todo[inline]{Images of BossBase}
+
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/bossbase.png}
+    \caption[BossBase]{Images from BossBase dataset}
+    \label{fig:bossbase}
+\end{figure}
+
 The cover dataset is generated by feeding the 10 000 images from BossBase to ImageCompressor, the images are saved as .pt (pytorch tensors). For stego datasets, several where generated for each method. One dataset is generated per payload and per method used. Taking into consideration that Bossbase, cover and one stego dataset take 90GB of space on disk, it was not possible to store many versions of stego datasets at once. Thus, every time a new stego dataset was generated, the previous one was removed in order to save some space.\\
 For every method, the generation of the stego dataset is similar. The only difference is which variant of ImageCompressor model is used. The steps are the following:
 \begin{itemize}
@@ -153,8 +159,19 @@ For every method, the generation of the stego dataset is similar. The only diffe
     \item save the generated image as a tensor on disk
 \end{itemize}
 
-As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels in order to feed them to each model.
-\todo[inline]{Talk about img\_saving.ipynb}
+As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels in order to feed them to each model.\\
+Two options where available for saving images on disk:
+\begin{enumerate}
+    \item Save the latent representation as .pt
+    \item Save the reconstructed tensor image as .pt
+\end{enumerate}
+Option 1 was implemented first, but due to some unkown reason, the tensor saved on disk was different from the original one once it was loaded. This might be a bug from pytorch. This resulted in the appearance of anomalies on the reconstructed images as seen on \autoref{fig:save}. Consequently, option 2 was implemented to have properly reconstructed images.
+\begin{figure}[h]
+    \includegraphics[width=.49\textwidth]{img/anomalies.png}
+    \includegraphics[width=.49\textwidth]{img/correct_img.png}
+    \caption[Image reconstructed from tensor saved on disk]{image reconstructed with option 1 vs image with options 2}
+    \label{fig:save}
+\end{figure}
 
 \subsubsection{Fine-tuning the pretrained model}
 Once the datasets are generated. We can fine-tune JINSRNet.
@@ -178,7 +195,7 @@ img_numpy = img_pytorch[0].permute(1,2,0).cpu().numpy()
         $5.15\ ms\ \pm\ 238 \mu s$  & $523 \mu s\ \pm\ 18.7 \mu s  $\\
         \hline
     \end{tabular}
-    \caption[short]{Performances comparison of tensor to numpy conversion}
+    \caption[Performances comparison of tensor to numpy conversion]{Performances comparison of tensor to numpy conversion}
     \label{tab:torch2np}
 \end{table}
 
@@ -197,15 +214,38 @@ img_numpy = img_pytorch[0].permute(1,2,0).cpu().numpy()
     3 & width & $\emptyset$\\
     \hline
 \end{tabular}    
-\caption[short]{Difference of image representation between NumPy and Pytorch}
+\caption[Difference of image representation between NumPy and Pytorch]{Difference of image representation between NumPy and Pytorch}
 \end{table}
 The first fine-tuning training were done for the LSB replacement method. A stego dataset needs to be generated for each insertion rate. The first training was performed for an insertion rate of 1.5 bpc (bits per coefficient). Which is the highest insertion rate possible. At this rate, it is possible to draw distinction between cover and stego images just by looking at them. This training was done to make sure that JINSRnet could easily distinguish them. Once the first training was performed, the insertion rate was progressively decreased. The metric of interest was the prediction error on validation set. The goal was to find, for the LSB replacement method, an insertion rate such that the prediction error would be between 10\% ad 20\% in order to have some margin to see the improvment in performance with the side information method. This was done with the idea of comparing methods for a given insertion rate. We will see in the next section this comparison was not possible. Therefore, the other way of comparing methods has been prefered: finding different insertion rates for which all methods have similar prediction error.
 
 \subsection{Results}
-\subsubsection{Naive insertion}
-\subsubsection{Side information}
-\subsubsection{Modified cost}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/val_pe_all.png}
+    \caption[Steganalysis results]{Prediction error on validation set for all methods and 
+    different embedding rates}
+    \label{fig:results}
+\end{figure}
 
+\subsubsection{LSB replacement}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/lsb_results.png}
+    \caption[LSB replacement result]{LSB replacement results}
+    \label{fig:lsb_results}
+\end{figure}
+
+\subsubsection{Side information methods}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/side_inf_results.png}
+    \caption[Side information methods results]{Prediction error on validationset for both side information methods}
+    \label{fig:side_inf_results}
+\end{figure}
+
+\subsubsection{Comparison}
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{img/results_comparison.png}
+    \caption[short]{Comparison between the 3 methods}
+    \label{fig:results_comparison}
+\end{figure}
 \section{Conclusion}
 
 \section*{References}
