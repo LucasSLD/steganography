@@ -1,0 +1,56 @@
+@online{LiujiahengIclr_17_compressionEndtoend,
+  title = {Liujiaheng/Iclr\_17\_compression: {{End-to-end}} Optimized Image Compression},
+  url = {https://github.com/liujiaheng/iclr_17_compression},
+}
+
+@online{balleEndtoendOptimizedImage2017,
+  title = {End-to-End {{Optimized Image Compression}}},
+  author = {Ballé, Johannes and Laparra, Valero and Simoncelli, Eero P.},
+  date = {2017-03-03},
+  eprint = {1611.01704},
+  eprinttype = {arxiv},
+  eprintclass = {cs, math},
+  url = {http://arxiv.org/abs/1611.01704},
+  abstract = {We describe an image compression method, consisting of a nonlinear analysis transformation, a uniform quantizer, and a nonlinear synthesis transformation. The transforms are constructed in three successive stages of convolutional linear filters and nonlinear activation functions. Unlike most convolutional neural networks, the joint nonlinearity is chosen to implement a form of local gain control, inspired by those used to model biological neurons. Using a variant of stochastic gradient descent, we jointly optimize the entire model for rate–distortion performance over a database of training images, introducing a continuous proxy for the discontinuous loss function arising from the quantizer. Under certain conditions, the relaxed loss function may be interpreted as the log likelihood of a generative model, as implemented by a variational autoencoder. Unlike these models, however, the compression model must operate at any given point along the rate–distortion curve, as specified by a trade-off parameter. Across an independent set of test images, we find that the optimized method generally exhibits better rate–distortion performance than the standard JPEG and JPEG 2000 compression methods. More importantly, we observe a dramatic improvement in visual quality for all images at all bit rates, which is supported by objective quality estimates using MS-SSIM.},
+  langid = {english},
+  pubstate = {preprint},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Information Theory},
+  file = {/home/lucas/Zotero/storage/N2TB3XDS/Ballé et al. - 2017 - End-to-end Optimized Image Compression.pdf}
+}
+
+@inproceedings{butoraRevisitingPerturbedQuantization2021,
+  title = {Revisiting {{Perturbed Quantization}}},
+  booktitle = {Proceedings of the 2021 {{ACM Workshop}} on {{Information Hiding}} and {{Multimedia Security}}},
+  author = {Butora, Jan and Fridrich, Jessica},
+  date = {2021-06-17},
+  pages = {125--136},
+  publisher = {ACM},
+  location = {Virtual Event Belgium},
+  url = {https://dl.acm.org/doi/10.1145/3437880.3460396},
+  abstract = {In this work, we revisit Perturbed Quantization steganography with modern tools available to the steganographer today, including near-optimal ternary coding and content-adaptive embedding with side-information. In PQ, side-information in the form of rounding errors is manufactured by recompressing a JPEG image with a judiciously selected quality factor. This side-information, however, cannot be used in the same fashion as in conventional side-informed schemes nowadays as this leads to highly detectable embedding. As a remedy, we utilize the steganographic Fisher information to allocate the payload among DCT modes. In particular, we show that the embedding should not be constrained to contributing coefficients only as in the original PQ but should be expanded to the so-called “contributing DCT modes.” This approach is extended to color images by slightly modifying the SI-UNIWARD algorithm. Using the best detectors currently available, it is shown that by manufacturing side information with double compression, one can embed the same amount of information into the doubly-compressed cover image with a significantly better security than applying JUNIWARD directly in the single-compressed image. At the end of the paper, we show that double compression with the same quality makes side-informed steganography extremely detectable and should be avoided.},
+  langid = {english},
+  file = {/home/lucas/Zotero/storage/FYAXLJXS/Butora et Fridrich - 2021 - Revisiting Perturbed Quantization.pdf}
+}
+
+@thesis{butoraStatisticalModelsImage2017,
+  title = {Statistical Models for Image Steganography Explaining and Replacing Heuristics},
+  author = {Butora, Jan},
+  date = {2017},
+  institution = {Binghamton University},
+  url = {https://janbutora.github.io/assets/pdfs/Butora_PhD_Dissertation.pdf},
+  abstract = {The steganographic field is nowadays dominated by heuristic approaches for data hiding. While there exist a few model-based steganographic algorithms designed to minimize statistical detectability of the underlying model, many more algorithms based on costs of changing a specific pixel or a DCT coefficient have been over the last decade introduced. These costs are purely heuristic, as they are designed with feedback from detectors implemented as machine learning classifiers. For this reason, there is no apparent relation to statistical detectability, even though in practice they provide comparable security to model-based algorithms. Clearly, the security of such algorithms stands only on the assumption, that the detector used to assess the security, is the best one possible. Such assumption is of course completely unrealistic. Similarly, steganalysis is mainly implemented with empirical machine learning detectors, which use hand-crafted features computed from images or as deep learning detectors - convolutional neural networks. The biggest drawback of this approach is that the steganalyst, even though having a very good detection power, has very little to no knowledge about what part of the image or the embedding algorithm contributes to the detection, because the detector is used as a black box. In this dissertation, we will try to leave the heuristics behind and go towards statistical models. First, we introduce statistical models for current heuristic algorithms, which helps us understand and predict their security trends. Furthemore this allows us to improve the security of such algorithms. Next, we focus on steganalysis exploiting universal properties of JPEG images. Under certain realistic conditions, this leads to a very powerful attack against any steganography, because embedding even a very small secret message breaks the statistical model. Lastly, we show how we can improve security of JPEG compressed images through additional compression.},
+  pagetotal = {127},
+  file = {/home/lucas/Zotero/storage/DWCDYGWW/Butora_PhD_Dissertation.pdf}
+}
+
+@article{liuLosslessImageSteganography2022,
+  title = {Lossless {{Image Steganography Based}} on {{Invertible Neural Networks}}},
+  author = {Liu, Lianshan and Tang, Li and Zheng, Weimin},
+  date = {2022-12-01},
+  journaltitle = {Entropy},
+  shortjournal = {Entropy},
+  url = {https://www.mdpi.com/1099-4300/24/12/1762},
+  abstract = {Image steganography is a scheme that hides secret information in a cover image without being perceived. Most of the existing steganography methods are more concerned about the visual similarity between the stego image and the cover image, and they ignore the recovery accuracy of secret information. In this paper, the steganography method based on invertible neural networks is proposed, which can generate stego images with high invisibility and security and can achieve lossless recovery for secret information. In addition, this paper introduces a mapping module that can compress information actually embedded to improve the quality of the stego image and its antidetection ability. In order to restore message and prevent loss, the secret information is converted into a binary sequence and then embedded in the cover image through the forward operation of the invertible neural networks. This information will then be recovered from the stego image through the inverse operation of the invertible neural networks. Experimental results show that the proposed method in this paper has achieved competitive results in the visual quality and safety of stego images and achieved 100\% accuracy in information extraction.},
+  langid = {english},
+  file = {/home/lucas/Zotero/storage/JEWUW88R/Liu et al. - 2022 - Lossless Image Steganography Based on Invertible N.pdf}
+}
