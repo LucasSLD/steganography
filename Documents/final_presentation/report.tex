@@ -87,7 +87,7 @@ The generation of the training data was done using a script provided on the gith
 \section{Steganography}
 \subsection{Naive method: LSB replacement}
 \subsubsection{Least significant bit replacement}
-The least significant bit replacement consists in adding or substracting 1 to quantized coefficients of the latent representation with a given probability. We can model the modification as follows:
+The least significant bit replacement consists of adding or substracting 1 to quantized coefficients of the latent representation with a given probability. We can model the modification as follows:
 
 \begin{itemize}
     \item $c_i: \text{quantized coefficient in the latent space}$
@@ -130,7 +130,7 @@ To obtain different probabilities of modification for each coefficient, an optim
     \hline
     Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
     \hline
-    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
+    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distortion to minimize \\ 
     \hline
 \end{tabular}
 \caption[Side information]{Optimization problem to solve}
@@ -139,7 +139,7 @@ To obtain different probabilities of modification for each coefficient, an optim
 This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas. This code only works with 1-D numpy arrays.
 
 \subsubsection{Implementation}
-Since the code for solving the optimization problem is given, we only needed to get the elements to run it: 1D numpy arrays of the cost of +1 and -1 modifications.
+Since the code for solving the optimization problem is given, we only needed to get the elements to run it: 1D numpy arrays of the costs of +1 and -1 modifications.
 
 \DontPrintSemicolon
 \begin{algorithm}[H]
@@ -154,8 +154,8 @@ Since the code for solving the optimization problem is given, we only needed to 
         $p_{+1}$: array of probabilities of +1 modification\\
         $p_{-1}$: array of probabilities of -1 modification\\
         Q': Q with modified coef w.r.t $p_{-1}$, $p_{+1}$ probabilities\\
-        M: size of the message to embbed\\
-        N: number of coeffcients in C}
+        M: size of the message to embed\\
+        N: number of coeffecients in C}
         $Q \gets round(C)$\\
         $QE \gets C - Q$\\
         $QE.flatten()$\\
@@ -166,7 +166,7 @@ Since the code for solving the optimization problem is given, we only needed to 
     \end{algorithm}
 
 \subsubsection{Modifying the cost}
-The third method is similar to the second one. The only difference is how the cost of modification are computed. In this method, there is a non negative cost associated to the +0 modification. This change was driven by curiosity. We were wondering what would be the impact of penalizing the absence of modification.
+The third method is similar to the second one. The only difference is how the costs of modification are computed. In this method, there is a non negative cost associated to the +0 modification. This change was driven by curiosity. We were wondering what would be the impact of penalizing the absence of modification.
 \begin{table}[H]
 \begin{tabular}{ |c|c|c| }
     \hline
@@ -181,7 +181,7 @@ The third method is similar to the second one. The only difference is how the co
     \hline
     Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
     \hline
-    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
+    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distortion to minimize \\ 
     \hline
 \end{tabular}
 \caption[Side information variant]{Variant of the optimization problem}
@@ -189,7 +189,7 @@ The third method is similar to the second one. The only difference is how the co
 
 \section{Steganalysis}
 \subsection{JIN SRNet}
-JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image \autocite{liuLosslessImageSteganography2022}. It is pretrained on ImageNet database \autocite{butoraRevisitingPerturbedQuantization2021}. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payload for each method such that the prediction error is the same. 
+JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image \autocite{liuLosslessImageSteganography2022}. It is pretrained on ImageNet database \autocite{butoraRevisitingPerturbedQuantization2021}. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payloads for each method such that the prediction error is the same. 
 \subsubsection{Generating cover and stego datasets}
 To fine-tune the JINSRNet model, the first step is to generate cover and stego datasets. The original dataset used is BossBase. A dataset of 10 000 grayscaled images saved in pgm format. 
 
@@ -199,22 +199,22 @@ To fine-tune the JINSRNet model, the first step is to generate cover and stego d
     \label{fig:bossbase}
 \end{figure}
 
-The cover dataset is generated by feeding the 10 000 images from BossBase to ImageCompressor, the images are saved as .pt (pytorch tensors). For stego datasets, several where generated for each method. One dataset is generated per payload and per method used. Taking into consideration that Bossbase, cover and one stego dataset take 90GB of space on disk, it was not possible to store many versions of stego datasets at once. Thus, every time a new stego dataset was generated, the previous one was removed in order to save some space.\\
+The cover dataset is generated by feeding the 10 000 images from BossBase to ImageCompressor, the images are saved as .pt (pytorch tensors). For stego datasets, several were generated for each method. One dataset is generated per payload and method used. Taking into consideration that Bossbase, cover and one stego dataset take 90GB of space on disk, it was not possible to store many versions of stego datasets at once. Thus, every time a new stego dataset was generated, the previous one was removed to save some space.\\
 For every method, the generation of the stego dataset is similar. The only difference is which variant of ImageCompressor model is used. The steps are the following:
 \begin{itemize}
     \item read pgm files (original images from BossBase)
     \item convert each file into a tensor as ImageCompressor-based models works with tensors
     \item feed the tensor image to the ImageCompressor-based model corresponding to the method we want to use with the correct payload (ImageCompressorSteganography for LSB, ImageCompressorSteganography\_QE for side information and ImageCompressorSteganography\_QE\_modified\_cost for the variant of side information)
-    \item save the generated image as a tensor on disk
+    \item save the generated image as a tensor on the disk
 \end{itemize}
 
 As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels \autocite{butoraStatisticalModelsImage2017} in order to feed them to each model.\\
-Two options where available for saving images on disk:
+Two options were available for saving images on the disk:
 \begin{enumerate}
     \item Save the latent representation as .pt
     \item Save the reconstructed tensor image as .pt
 \end{enumerate}
-Option 1 was implemented first, but due to some unkown reason, the tensor saved on disk was different from the original one once it was loaded. This might be a bug from pytorch. This resulted in the appearance of anomalies on the reconstructed images as seen on \autoref{fig:save}. Consequently, option 2 was implemented to have properly reconstructed images.
+Option 1 was implemented first, but due to some unknown reason, the tensor saved on disk was different from the original one once it was loaded. This might be a bug from pytorch. This resulted in the appearance of anomalies on the reconstructed images as seen in \autoref{fig:save}. Consequently, option 2 was implemented to have properly reconstructed images.
 \begin{figure}[H]
     \includegraphics[width=.49\textwidth]{img/anomalies.png}
     \includegraphics[width=.49\textwidth]{img/correct_img.png}
@@ -224,7 +224,7 @@ Option 1 was implemented first, but due to some unkown reason, the tensor saved 
 
 \subsubsection{Fine-tuning the pretrained model}
 Once the datasets are generated. We can fine-tune JINSRNet.
-Training script and pretrained model were kindly provided by Jan Butora. Some adjustment were needed in order to load the training data as the original script loaded jpeg files. The class loading the data is called a retriever. We implemented a retriever that works with .pt files (pytorch tensors). The images saved as pytorch tensors are loaded and converted into numpy arrays. To convert pytorch images into numpy images there is two different methods. The first one consists in using the ToPILImage() function of pytorch which converts a pytorch tensor into a PIL image which we can then convert into a numpy array. The second method consists in permuting axis of the tensor to fit numpy convention for representation of images and then converting the tensor into a numpy array by using numpy() function of pytorch Tensor class. As we can see on \autoref{tab:torch2np}, the method of permuting axis and converting to NumPy using numpy() function is about 10 times faster than the other method. Thus this method is the one used for tensor to numpy array conversion.\\
+Training script and pretrained model were kindly provided by Jan Butora. Some adjustment were needed in order to load the training data as the original script loaded jpeg files. The class loading the data is called a retriever. We implemented a retriever that works with .pt files (pytorch tensors). The images saved as pytorch tensors are loaded and converted into numpy arrays. To convert pytorch images into numpy images there is two different methods. The first one consists of using the ToPILImage() function of pytorch which converts a pytorch tensor into a PIL image which we can then convert into a numpy array. The second method consists of permuting axis of the tensor to fit numpy convention for representation of images and then converting the tensor into a numpy array by using numpy() function of pytorch Tensor class. As we can see in \autoref{tab:torch2np}, the method of permuting axis and converting to NumPy using numpy() function is about 10 times faster than the other method. Thus this method is the one used for tensor to numpy array conversion.\\
 
 \begin{lstlisting}[caption={Conversion of pytorch tensors into numpy images}, label={lst:example}]
 to_pil = ToPILImage()
@@ -265,13 +265,13 @@ img_numpy = img_pytorch[0].permute(1,2,0).cpu().numpy()
 \end{tabular}    
 \caption[Difference of image representation between NumPy and Pytorch]{Difference of image representation between NumPy and Pytorch}
 \end{table}
-The first fine-tuning training were done for the LSB replacement method. A stego dataset needs to be generated for each insertion rate. The first training was performed for an insertion rate of 1.5 bpc (bits per coefficient). Which is the highest insertion rate possible. At this rate, it is possible to draw distinction between cover and stego images just by looking at them. This training was done to make sure that JINSRnet could easily distinguish them. Once the first training was performed, the insertion rate was progressively decreased. The metric of interest was the prediction error on validation set. The goal was to find, for the LSB replacement method, an insertion rate such that the prediction error would be between 10\% ad 20\% in order to have some margin to see the improvment in performance with the side information method. This was done with the idea of comparing methods for a given insertion rate. We will see in the next section this comparison was not possible. Therefore, the other way of comparing methods has been prefered: finding different insertion rates for which all methods have similar prediction error.
+The first fine-tuning training was done for the LSB replacement method. A stego dataset needs to be generated for each insertion rate. The first training was performed for an insertion rate of 1.5 bpc (bits per coefficient). Which is the highest insertion rate possible. At this rate, it is possible to draw a distinction between cover and stego images just by looking at them. This training was done to make sure that JINSRnet could easily distinguish them. Once the first training was performed, the insertion rate was progressively decreased. The metric of interest was the prediction error on the validation set. The goal was to find, for the LSB replacement method, an insertion rate such that the prediction error would be between 10\% ad 20\% in order to have some margin to see the improvement in performance with the side information method. This was done with the idea of comparing methods for a given insertion rate. We will see in the next section this comparison was not possible. Therefore, the other way of comparing methods has been preferred: finding different insertion rates for which all methods have similar prediction error.
 
 \subsection{Results}
 Fine-tuning for LSB replacement was performed with a pretrained version of JINSRNet provided by Jan Butora for embedding rate from 1.5 bpc to 0.002 bpc. After that, the checkpoint of SRNet from the 0.002 bpc training  was used for other embedding rates and methods to have faster convergence.
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{img/val_pe_all.png}
-    \caption[Steganalysis results]{Prediction error on validation set for all methods and 
+    \caption[Steganalysis results]{Prediction error on the validation set for all methods and 
     different embedding rates}
     \label{fig:results}
 \end{figure}
@@ -282,15 +282,15 @@ Fine-tuning for LSB replacement was performed with a pretrained version of JINSR
     \caption[LSB replacement result]{LSB replacement results}
     \label{fig:lsb_results}
 \end{figure}
-The difficulty in the fine-tunning process was to find embedding rates so that drawing distinction between cover and stego would not be too hard (50\% prediction error) nor too easy (0\% prediction error). The embedding rate of 0.003 bpc was the first one for which we could obtain a prediction error in the 5\% - 20\% prediction error range. The weights of the model obtained from this training were then used for other training with lower embedding rates. We can see that there has been two trainings performed for an embedding rate of 0.001 bpc (see gray and dark blue curves on \autoref{fig:lsb_results}). The gray curve was the training performed with the first pretrained model of JINSRNet, the model could not distinguish cover and stego images as the prediction error on validation set was 50\%. Using the fine-tuned version obtained from the 0.003 bpc training, we obtained the blue curve with a prediction error between 15\% and 20\%. The results from LSB replacement serves as a baseline for comparison with other methods.
+The difficulty in the fine-tunning process was to find embedding rates so that drawing distinction between cover and stego would not be too hard (50\% prediction error) nor too easy (0\% prediction error). The embedding rate of 0.003 bpc was the first one for which we could obtain a prediction error in the 5\% - 20\% prediction error range. The weights of the model obtained from this training were then used for other training with lower embedding rates. We can see that there have been two trainings performed for an embedding rate of 0.001 bpc (see gray and dark blue curves in \autoref{fig:lsb_results}). The gray curve was the training performed with the first pretrained model of JINSRNet, the model could not distinguish cover and stego images as the prediction error on the validation set was 50\%. Using the fine-tuned version obtained from the 0.003 bpc training, we obtained the blue curve with a prediction error between 15\% and 20\%. The results from LSB replacement serve as a baseline for comparison with other methods.
 
 \subsubsection{Side information methods}
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{img/side_inf_results.png}
-    \caption[Side information methods results]{Prediction error on validationset for both side information methods}
+    \caption[Side information methods results]{Prediction error on the validation set for both side information methods}
     \label{fig:side_inf_results}
 \end{figure}
-Side information-based methods were able to embbed far more information before becoming detectable. During this trainings, we realized that we would not find a embedding rate such that we could have both side information and LSB replacement in the (0\%,50\%) range. Either the LSB stego would be too easy to detect or the side information stego would be too hard to detect. Consequently, we decided to find an embedding rate for which the prediction errors are similar for the different methods.
+Side information-based methods were able to embed far more information before becoming detectable. During this trainings, we realized that we would not find an embedding rate such that we could have both side information and LSB replacement in the (0\%,50\%) range. Either the LSB stego would be too easy to detect or the side information stego would be too hard to detect. Consequently, we decided to find an embedding rate for which the prediction errors are similar for the different methods.
 
 \subsubsection{Comparison}
 \begin{figure}[H]
@@ -298,10 +298,10 @@ Side information-based methods were able to embbed far more information before b
     \caption[Comparative results]{Comparison between the 3 methods}
     \label{fig:results_comparison}
 \end{figure}
-These three curves were obtained using the same version of JINSRNet (checkpoint from the 0.003 bpc training). As we can see, we could obtain similar prediction errors for the three methods. We observe that side information allows an embedding rate approximatively 60 times higher than LSB method.
+These three curves were obtained using the same version of JINSRNet (checkpoint from the 0.003 bpc training). As we can see, we could obtain similar prediction errors for the three methods. We observe that side information allows an embedding rate approximately 60 times higher than LSB method.
 
 \section{Conclusion}
-This project has been a first look on steganography performed on images compressed by AI. Embedding information in the latent representation of images obtained through encoder network was not studied before and we obtained baseline results for different methods: LSB replacement, side information and its variant. There are many perspectives for this project. A comparison with JPEG steganography  would help to see the benefits and inconvenients of steganography on AI-compressed images. During this project, steganography was only performed on grayscale images as we used BossBase dataset. We could work on RGB images as the autoencoder used for image compression works with RGB images. Finally, to obtain better results, running tests for the different methods instead of just usinf the prediction error on validation set would have been better but it has not been done due to a lack of time.
+This project has been a first look on steganography performed on images compressed by AI. Embedding information in the latent representation of images obtained through encoder network was not studied before and we obtained baseline results for different methods: LSB replacement, side information and its variant. There are many perspectives for this project. A comparison with JPEG steganography  would help to see the benefits and inconvenients of steganography on AI-compressed images. During this project, steganography was only performed on grayscale images as we used BossBase dataset. We could work on RGB images as the autoencoder used for image compression works with RGB images. Finally, to obtain better results, running tests for the different methods instead of just using the prediction error on the validation set would have been better but it has not been done due to a lack of time.
 
 \printbibliography
 \end{document}
