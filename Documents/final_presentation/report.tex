@@ -15,6 +15,8 @@
 \usepackage{multicol}
 \usepackage{listings}
 \usepackage[ruled, lined, linesnumbered, commentsnumbered, longend]{algorithm2e}
+\usepackage{biblatex}
+\addbibresource{RP.bib}
 
 
 \lstset{
@@ -52,7 +54,7 @@ Using deep learning for image compression was first introduced in "End-To-End Op
 
 \section{AI image compression}
 \subsection{Autoencoder and latent space}
-The idea behind AI image compression is to have a compact representation of images using deep learning. To do so, we can use an autoencoder. The encoder part is used to obtain a representation of images in latent space. The coefficients of this representation is then quantized. We can then reconstruct a quantized image by feeding the quantized latent representation to the decoder part of the autoencoder. The training is done by optimizing the weighted sum of the rate and distortion.
+The idea behind AI image compression is to have a compact representation of images using deep learning. To do so, we can use an autoencoder. The encoder part is used to obtain a representation of images in latent space. The coefficients of this representation is then quantized. We can then reconstruct a quantized image by feeding the quantized latent representation to the decoder part of the autoencoder. The training is done by optimizing the weighted sum of the rate and distortion \autocite{balleEndtoendOptimizedImage2017}.
 \begin{figure}[H]
     \centering
     \includegraphics*[width=.6\textwidth]{./img/transform_coding.png}
@@ -65,7 +67,7 @@ Compressed images obtained with the autoencoder approach are smoother than the o
     \caption[AI compression vs JPEG]{AI compression vs JPEG compression (End To End Image Compression paper)}
 \end{figure}
 
-A pytorch implementation of this idea was provided by the iclr\_17\_compression repository available on Github. Nevertheless, no model checkpoint nor training data were provided.
+A pytorch implementation of this idea was provided by the iclr\_17\_compression repository \autocite{LiujiahengIclr_17_compressionEndtoend} available on Github. Nevertheless, no model checkpoint nor training data were provided.
 
 
 \subsection{Training the model}
@@ -187,7 +189,7 @@ The third method is similar to the second one. The only difference is how the co
 
 \section{Steganalysis}
 \subsection{JIN SRNet}
-JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image. It is pretrained on ImageNet database. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payload for each method such that the prediction error is the same. 
+JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image \autocite{liuLosslessImageSteganography2022}. It is pretrained on ImageNet database \autocite{butoraRevisitingPerturbedQuantization2021}. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payload for each method such that the prediction error is the same. 
 \subsubsection{Generating cover and stego datasets}
 To fine-tune the JINSRNet model, the first step is to generate cover and stego datasets. The original dataset used is BossBase. A dataset of 10 000 grayscaled images saved in pgm format. 
 
@@ -206,7 +208,7 @@ For every method, the generation of the stego dataset is similar. The only diffe
     \item save the generated image as a tensor on disk
 \end{itemize}
 
-As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels in order to feed them to each model.\\
+As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels \autocite{butoraStatisticalModelsImage2017} in order to feed them to each model.\\
 Two options where available for saving images on disk:
 \begin{enumerate}
     \item Save the latent representation as .pt
@@ -299,7 +301,7 @@ Side information-based methods were able to embbed far more information before b
 These three curves were obtained using the same version of JINSRNet (checkpoint from the 0.003 bpc training). As we can see, we could obtain similar prediction errors for the three methods. We observe that side information allows an embedding rate approximatively 60 times higher than LSB method.
 
 \section{Conclusion}
+This project has been a first look on steganography performed on images compressed by AI. Embedding information in the latent representation of images obtained through encoder network was not studied before and we obtained baseline results for different methods: LSB replacement, side information and its variant. There are many perspectives for this project. A comparison with JPEG steganography  would help to see the benefits and inconvenients of steganography on AI-compressed images. During this project, steganography was only performed on grayscale images as we used BossBase dataset. We could work on RGB images as the autoencoder used for image compression works with RGB images. Finally, to obtain better results, running tests for the different methods instead of just usinf the prediction error on validation set would have been better but it has not been done due to a lack of time.
 
-
-\section*{References}
+\printbibliography
 \end{document}
