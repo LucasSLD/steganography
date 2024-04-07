@@ -1,0 +1,259 @@
+% *** DOCUMENT CLASS ***%
+\documentclass[11pt,compress]{beamer} % handout,
+\usetheme{Madrid}
+\usecolortheme{crane}
+\useoutertheme[subsection=false,shadow]{miniframes}
+
+% ! full class documentation available here
+% http://tug.ctan.org/macros/latex/contrib/beamer/doc/beameruserguide.pdf
+
+%===============================================
+% *** GENERAL PACKAGES *** %
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{lipsum}
+
+%===============================================
+% *** ALGORITHM PACKAGE *** %
+\usepackage[ruled,vlined]{algorithm2e}
+\newcommand{\forcond}[2]{#1 \KwTo #2}
+\SetAlgoSkip{}
+
+%===============================================
+% *** GRAPHICS RELATED PACKAGES *** %
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf,.jpg,.png,.gif}
+\graphicspath{{figs/}}
+
+%===============================================
+% *** MATH PACKAGES *** %
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathrsfs} % Ralph Smith’s Formal Script Font : mathrsfs{A}
+\usepackage{mathtools}
+\usepackage{siunitx}  % physics units
+\usepackage{bm}
+\usepackage{stmaryrd}
+
+%===============================================
+% *** BIBLIOGRAPHY PACKAGE *** 
+\usepackage[backend=biber, style=authortitle]{biblatex}
+\addbibresource{RP.bib}
+\usepackage{appendixnumberbeamer}
+
+% display table of content at the beginning of each section
+ \AtBeginSection[] {
+ \ifnum \value{section}=1
+   {
+   \begin{frame}
+     \frametitle{Overview}
+       \small \tableofcontents[sectionstyle=show/shaded]
+   \end{frame}
+   }
+ \else{
+   \begin{frame}
+       \small \tableofcontents[currentsection,sectionstyle=show/shaded,hideothersubsections]
+   \end{frame}}
+ \fi
+ }
+\setbeamertemplate{caption}[numbered]
+
+\newcommand\blfootnote[1]{%
+ \begingroup
+ \renewcommand\thefootnote{}\footnote[frame]{#1}%
+ \addtocounter{footnote}{-1}%
+ \endgroup
+}
+
+\begin{document}
+
+\title[]{Steganography on AI-compressed images}
+\author{Lucas SALAND\\ Supervisors: Patrick Bas, Jan Butora}
+\institute{Université de Lille}
+\date[\today]{\includegraphics[keepaspectratio,width=0.2\textwidth]{img/ul.png} \medskip \\ Lille, France \medskip \\ \today}
+
+\frame{\titlepage}
+
+\section*{Overview}
+\begin{frame}
+  \tableofcontents
+\end{frame}
+
+\section{Context}
+\subsection{AI-compressed images}
+\begin{frame}{AI-compressed images}
+  \only<1>{
+    \centering
+    \includegraphics[width=10cm]{./img/iclr17.png}
+  }
+  \only<2>{
+    \begin{center}
+      \textbf{Autoencoder}
+      \begin{figure}
+        \includegraphics[width=7cm]{./img/autoencoder.png}
+      \end{figure}
+    \end{center}
+    Objective: minimize weighted sum of the rate of compression and distortion
+    }
+\end{frame}
+
+\subsection{Steganography \& Steganalysis}
+
+\begin{frame}{Steganography \& Steganalysis}
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{block}{Steganography}
+        Hiding a message within another content.
+      \end{block}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Steganalysis}
+        Detecting if a message carries hidden information, embedded through steganography.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Objectives}
+\begin{frame}{Objectives}
+  \begin{itemize}
+    \item Embed undetectable messages into compressed format with naive insertion ($\pm1$ on LSB);\vspace{.7cm}
+    \item Analyse induced distortion on decompressed images;\vspace{.7cm}
+    \item Use quantization error to reduce detectability.
+  \end{itemize}
+\end{frame}
+
+
+\section{AI image compression}
+\begin{frame}{AI compression}
+  \only<1>{
+    \centering
+    \begin{columns}
+      \begin{column}{.4\textwidth}
+        \begin{itemize}
+          \item Minimizing weighted sum of distorsion and rate of compression
+          \item Trained on 80GB of images
+          \item 6 epochs and 1 590 000 steps
+        \end{itemize}
+      \end{column}
+      \begin{column}{.5\textwidth}
+        \begin{figure}
+          \includegraphics[width=\textwidth]{img/ImageCompressor.png}
+        \end{figure}
+      \end{column}
+    \end{columns}
+  }
+  
+  \only<2>{
+    \begin{figure}
+      \includegraphics[width=\textwidth]{./img/Original_reconstructed.png}
+    \end{figure}
+  }
+
+  \only<3>{
+    \begin{figure}
+      \includegraphics[height=.8\textheight]{img/jpeg_ai.png}
+    \end{figure}
+  }
+\end{frame}
+
+
+\section{Steganography}
+\begin{frame}{LSB replacement}
+  \only<1>{
+    \begin{itemize}
+      \item ImageCompressorSteganography model $\rightarrow$ LSB replacement
+      \item Generation of cover and stego images using BossBase dataset
+    \end{itemize}
+    \begin{figure}
+      \includegraphics[width=0.5\textwidth]{./img/naive_insertion.png}
+    \end{figure}
+    \centering
+    Entropy: $H_3(p) = -2p*log_2(p) - (1-2p)*log_2(1-2p)$ (bits per coefficient)
+  }
+\end{frame}
+
+\begin{frame}{Side information: quantization error}
+  \begin{figure}
+    \includegraphics[width =.5\textwidth]{./img/side_inf_diagram.png}
+  \end{figure}
+\end{frame}
+
+\section{Steganalysis}
+\begin{frame}{Steganalysis}
+  \only<1>{
+    \begin{itemize}
+      \item Borrowed JINSRNet code and weights from Jan Butora as well as training scripts\vspace{.5cm}
+      \item Adapted the code to work with pytorch tensors\vspace{.5cm}
+      \item Finetuned JINSRNet pretrained model on generated cover/stego datasets
+    \end{itemize}
+    }
+    \only<2>{
+      \begin{figure}
+        \includegraphics[height=0.5\textheight]{./img/legend.png}
+        \includegraphics[height=0.5\textheight]{./img/val_PE.png}
+        \caption[short]{Prediction error on validation dataset}
+      \end{figure}
+      Either the detection is too easy (payload $\geq$ 0.003) or too hard (payload $\leq$ 0.001)
+      }
+      \only<3>{
+        \begin{figure}
+          \includegraphics[width=0.45\textwidth]{./img/cover.png}
+          \includegraphics[width=0.45\textwidth]{./img/stego_0_1.png}
+        \end{figure}
+      }
+      \only<4>{
+        \begin{figure}
+          \includegraphics[width=0.45\textwidth]{./img/cover.png}
+          \includegraphics[width=0.45\textwidth]{./img/stego_0_01.png}
+        \end{figure}
+      }
+      \only<5>{
+        \begin{figure}
+          \includegraphics[width=0.45\textwidth]{./img/cover_stego_0_1.png}
+          \includegraphics[width=0.45\textwidth]{./img/cover_stego_0_01.png}
+        \end{figure}
+        }
+      \only<6>{
+        \centering
+        \includegraphics[height=.9\textheight]{./img/cover_stego_0_001.png}
+      }
+\end{frame}
+
+\section{What's next}
+\begin{frame}{Insertion with quantization error}
+  \begin{itemize}
+    \item LSB insertion is too naive and easy to detect
+    \item Using quantization error to have higher probability of modification where the error is higher
+    \item Constraint: $\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{H_3(p_{i,k})}} = m$ (C)
+    \item Optimization: min($\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$)
+  \end{itemize}
+  Lagrangian optimization problem
+  \centering
+  $p_{i,k} = function(i,k,\lambda)$
+  $\boxed{p_{i,k} = function(i,k,\lambda),\ \lambda\ s.t.\ (C)\ is\ verified.}$
+\end{frame}
+
+\begin{frame}{Other ideas}
+  \begin{itemize}
+    \item steganography on RGB images
+    \item comparison with JPEG on steganalysis
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \centering
+  Questions
+\end{frame}
+% \begin{frame}{References}
+%   \printbibliography
+% \end{frame}
+\end{document}
+
