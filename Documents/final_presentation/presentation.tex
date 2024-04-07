@@ -181,67 +181,137 @@
 \end{frame}
 
 \begin{frame}{Side information: quantization error}
-  \begin{figure}
-    \includegraphics[width =.5\textwidth]{./img/side_inf_diagram.png}
-  \end{figure}
+  \only<1-2>{
+    \begin{figure}
+      \includegraphics[width =.5\textwidth]{./img/side_inf_diagram.png}
+    \end{figure}
+  }
+
+  \only<2>{
+    \begin{table}[H]
+    \resizebox{.75\textwidth}{!}{
+    \begin{tabular}{ |c|c|c| }
+      \hline
+      & Mathematical notations & Comments\\
+      \hline
+      & $e_i = \text{coef}_i - \text{quantized\_coef}_i$ & quantization error on the i-th coefficient\\ 
+      & $c_{i,-1} = 1 + 2e_i$ & cost of -1 modification\\ 
+      Notations & $c_{i,0} = 0$ & no penalization\\
+      & $c_{i,1} = 1 - 2e_i$ & cost of +1 modification\\
+      & $p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{e^{-\lambda c_{i,-1}} + e^{-\lambda c_{i,0}} + e^{-\lambda c_{i,1}}}$ & probability of +k on coef i, k $\in$ \{-1,0,1\}\\
+      & $\lambda$ & variable of the problem\\
+      \hline
+      Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
+      \hline
+      Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
+      \hline
+    \end{tabular}}
+    % \caption[Side information]{Optimization problem to solve}
+  \end{table}
+  }
+\end{frame}
+
+\begin{frame}{Side information: modified costs}
+  \begin{table}[H]
+    \resizebox{.75\textwidth}{!}{
+    \begin{tabular}{ |c|c|c| }
+        \hline
+        & Mathematical notations & Comments\\
+        \hline
+        & $e_i = \text{coef}_i - \text{quantized\_coef}_i$ & quantization error on the i-th coefficient\\ 
+        & $\textcolor{red}{c_{i,-1} = 1 + e_i}$ & cost of -1 modification\\ 
+        Notations & $\textcolor{red}{c_{i,0} = |e_i|}$ & cost of no modification\\
+        & $\textcolor{red}{c_{i,1} = 1 - e_i}$ & cost of +1 modification\\
+        & $p_{i,k} = \frac{e^{-\lambda c_{i,k}}}{e^{-\lambda c_{i,-1}} + e^{-\lambda c_{i,0}} + e^{-\lambda c_{i,1}}}$ & probability of +k on coef i, k $\in$ \{-1,0,1\}\\
+        & $\lambda$ & variable of the problem\\
+        \hline
+        Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
+        \hline
+        Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
+        \hline
+    \end{tabular}}
+    % \caption[Side information variant]{Variant of the optimization problem}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Visual impact of steganography}
+  \only<1>{
+      \begin{figure}
+        \includegraphics[width=0.45\textwidth]{./img/cover_bis.png}
+        \includegraphics[width=0.45\textwidth]{./img/stego_0_1.png}
+      \end{figure}
+    }
+  \only<2>{
+      \begin{figure}
+        \includegraphics[width=0.45\textwidth]{./img/cover_bis.png}
+        \includegraphics[width=0.45\textwidth]{./img/stego_0_01.png}
+      \end{figure}
+    }
+  \only<3>{
+      \begin{figure}
+        \includegraphics[width=0.45\textwidth]{./img/cover_stego_0_1.png}
+        \includegraphics[width=0.45\textwidth]{./img/cover_stego_0_01.png}
+      \end{figure}
+      }
+  \only<4>{
+      \centering
+      \includegraphics[height=.9\textheight]{./img/cover_stego_0_001.png}
+    }
 \end{frame}
 
 \section{Steganalysis}
-\begin{frame}{Steganalysis}
+\begin{frame}{JINSRNet}
   \only<1>{
     \begin{itemize}
-      \item Borrowed JINSRNet code and weights from Jan Butora as well as training scripts\vspace{.5cm}
-      \item Adapted the code to work with pytorch tensors\vspace{.5cm}
-      \item Finetuned JINSRNet pretrained model on generated cover/stego datasets
+      \item Deep convolutional neural network pretrained on ImageNet database.
+      \item Can be fine-tuned to detect steganography on AI-compressed images.
     \end{itemize}
     }
-    \only<2>{
-      \begin{figure}
-        \includegraphics[height=0.5\textheight]{./img/legend.png}
-        \includegraphics[height=0.5\textheight]{./img/val_PE.png}
-        \caption[short]{Prediction error on validation dataset}
-      \end{figure}
-      Either the detection is too easy (payload $\geq$ 0.003) or too hard (payload $\leq$ 0.001)
-      }
-      \only<3>{
+  \only<2>{
+    \begin{columns}
+      \begin{column}{.4\textwidth}
+        \begin{itemize}
+          \item 1 cover dataset
+          \item 1 stego dataset per embedding rate and method
+        \end{itemize}
+      \end{column}
+
+      \begin{column}{.6\textwidth}
         \begin{figure}
-          \includegraphics[width=0.45\textwidth]{./img/cover.png}
-          \includegraphics[width=0.45\textwidth]{./img/stego_0_1.png}
+          \includegraphics[height=.8\textheight]{img/cover_dataset.png}
         \end{figure}
-      }
-      \only<4>{
-        \begin{figure}
-          \includegraphics[width=0.45\textwidth]{./img/cover.png}
-          \includegraphics[width=0.45\textwidth]{./img/stego_0_01.png}
-        \end{figure}
-      }
-      \only<5>{
-        \begin{figure}
-          \includegraphics[width=0.45\textwidth]{./img/cover_stego_0_1.png}
-          \includegraphics[width=0.45\textwidth]{./img/cover_stego_0_01.png}
-        \end{figure}
-        }
-      \only<6>{
-        \centering
-        \includegraphics[height=.9\textheight]{./img/cover_stego_0_001.png}
-      }
+      \end{column}
+    \end{columns}
+  }
 \end{frame}
 
-\section{What's next}
-\begin{frame}{Insertion with quantization error}
-  \begin{itemize}
-    \item LSB insertion is too naive and easy to detect
-    \item Using quantization error to have higher probability of modification where the error is higher
-    \item Constraint: $\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{H_3(p_{i,k})}} = m$ (C)
-    \item Optimization: min($\sum_{i=1}^{nb\ coeff}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$)
-  \end{itemize}
-  Lagrangian optimization problem
-  \centering
-  $p_{i,k} = function(i,k,\lambda)$
-  $\boxed{p_{i,k} = function(i,k,\lambda),\ \lambda\ s.t.\ (C)\ is\ verified.}$
+\begin{frame}{Results}
+  \only<1>{
+    \begin{figure}
+      \includegraphics[width=\textwidth]{img/val_pe_all.png}
+    \end{figure}
+  }
+  \only<2>{
+    \begin{figure}
+      \includegraphics[width=\textwidth]{img/lsb_results.png}
+    \end{figure}
+  }
+  \only<3>{
+    \begin{figure}
+      \includegraphics[width=\textwidth]{img/side_inf_results.png}
+    \end{figure}
+  }
+  \only<4>{
+    \begin{figure}
+      \includegraphics[width=\textwidth]{img/results_comparison.png}
+    \end{figure}
+  }
 \end{frame}
 
-\begin{frame}{Other ideas}
+\section{Conclusion \& perspectives}
+
+
+\begin{frame}{name}
   \begin{itemize}
     \item steganography on RGB images
     \item comparison with JPEG on steganalysis
