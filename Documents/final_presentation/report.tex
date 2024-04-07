@@ -16,8 +16,11 @@
 \usepackage{listings}
 \usepackage[ruled, lined, linesnumbered, commentsnumbered, longend]{algorithm2e}
 \usepackage{biblatex}
+\usepackage{geometry}
 \addbibresource{RP.bib}
 
+% Set margins
+\geometry{left=2.54cm,right=2.54cm}
 
 \lstset{
     language=Python,
@@ -47,14 +50,15 @@
 \tableofcontents
 \listoffigures
 \listoftables
+\clearpage
 \section{Introduction}
-Communication is crucial in our civilization. There are many ways to communicate and transmit information nowadays. The rise of information technology in the past decades enabled more communication than ever before in many different forms: images, texts, videos, audios\dots Information is encoded in a specific way for each type of information. And even for a same type of media such as images, there exist different formats in which information can be encoded. What can be done when hidden communication is needed on a transmission channel that other might have access to? A first idea could be to use encryption to hide the meaning of the messsage, the presence of the message is known, its meaning is unknown.  A second idea is to hide the message to be transmitted in another piece of content and transmit it without raising suspicions about the modified piece of content. This is called steganography. The original piece of content is called a cover. Once the hidden message has been embedded, it becomes the stego. Steganography is often paired with steganalysis. The goal of steganalysis is to detect whether a message was hidden in a given piece of content. In this project, we were interested in steganography performed on AI-compressed images.\\
-There exists many papers on steganography performed on JPEG images but none explored yet steganography on AI-compressed images. Images can be represented in many different spaces: RGB, DCT (JPEG), YCbCr, HSV/HSL... The first step of steganography on images is to chose on which representation of images we want to embbed the message. AI-compressed images have their own representation.\\
-Using deep learning for image compression was first introduced in "End-To-End Optimized Image Compression". This paper developed the idea of using convolutional neural network to obtain a representation of images in a latent space. This representation in latent space is the one on which steganography will be performed. Modern steganalysis on images relies on neural network detectors. In this project, we use SRNet to perform classification of images with classes "stego" and "cover".
+Communication is crucial in our civilization. There are many ways to communicate and transmit information nowadays. The rise of information technology in the past decades enabled more communication than ever before in many different forms: images, texts, videos or audio. Information is encoded in a specific way for each type of information. And even for a same type of media such as images, there exist different formats in which information can be encoded. What can be done when hidden communication is needed on a transmission channel that other might have access to? A first idea could be to use encryption to hide the meaning of the messsage, the presence of the message is known, its meaning is unknown.  A second idea is to hide the message to be transmitted in another piece of content and transmit it without raising suspicions about the modified piece of content. This is called steganography. The original piece of content is called a cover. Once the hidden message has been embedded, it becomes the stego. Steganography is often paired with steganalysis. The goal of steganalysis is to detect whether a message was hidden in a given piece of content. In this project, we were interested in steganography performed on AI-compressed images.\\
+There exists many papers on steganography performed on JPEG images but none explored yet steganography on AI-compressed images. Images can be represented in many different spaces: RGB, DCT (JPEG), YCbCr, HSV/HSL. The first step of steganography on images is to choose on which representation of images we want to embed the message. AI-compressed images have their own representation.\\
+The use of deep learning for image compression was first introduced in "End-To-End Optimized Image Compression". This paper developed the idea of using convolutional neural network to obtain a representation of images in a latent space. This representation in latent space is the one on which steganography will be performed. Modern steganalysis on images relies on neural network detectors. In this project, we use SRNet to perform classification of images with classes "stego" and "cover".
 
 \section{AI image compression}
 \subsection{Autoencoder and latent space}
-The idea behind AI image compression is to have a compact representation of images using deep learning. To do so, we can use an autoencoder. The encoder part is used to obtain a representation of images in latent space. The coefficients of this representation is then quantized. We can then reconstruct a quantized image by feeding the quantized latent representation to the decoder part of the autoencoder. The training is done by optimizing the weighted sum of the rate and distortion \autocite{balleEndtoendOptimizedImage2017}.
+The idea behind AI image compression is to have a compact representation of images using deep learning. To do so, we can use an autoencoder. The encoder part is used to obtain a representation of images in latent space. The coefficients of this representation are then quantized. We can then reconstruct a quantized image by feeding the quantized latent representation to the decoder part of the autoencoder. The training is done by optimizing the weighted sum of the rate and distorsion \autocite{balleEndtoendOptimizedImage2017}.
 \begin{figure}[H]
     \centering
     \includegraphics*[width=.6\textwidth]{./img/transform_coding.png}
@@ -71,7 +75,7 @@ A pytorch implementation of this idea was provided by the iclr\_17\_compression 
 
 
 \subsection{Training the model}
-The generation of the training data was done using a script provided on the github repository. With this script, 80G of training data are generated. Once the training data has been generated, the training of the model can be started. The model used in all other experiments in this report has been trained over 1590000 steps across 6 epochs. The base models from which all other model in this project are derived from is called ImageCompressor.
+The generation of the training data was done using a script provided on the github repository \autocite{LiujiahengIclr_17_compressionEndtoend}. With this script, 80G of training data are generated. Once the training data has been generated, the training of the model can be started. The model used in all other experiments in this report has been trained over 1590000 steps across 6 epochs. The base model from which all other models in this project are derived from is called \textit{ImageCompressor}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=.8\textwidth]{./img/ImageCompressor.png}
@@ -90,12 +94,12 @@ The generation of the training data was done using a script provided on the gith
 The least significant bit replacement consists of adding or substracting 1 to quantized coefficients of the latent representation with a given probability. We can model the modification as follows:
 
 \begin{itemize}
-    \item $c_i: \text{quantized coefficient in the latent space}$
+    \item $c_i: \text{quantized coefficient in the latent space}$.
     \item $\mathcal{E}
     _i \sim Categorical_{\{-1,0,1\}},\\
     \ \mathbb{P}(\mathcal{E}_i = -1) = \mathbb{P}(\mathcal{E}_i = 1) = p,\\
     \mathbb{P}(\mathcal{E}_i = 0) = 1-2p$ 
-    \item $\hat{C}_i = c_i + \mathcal{E}_i \sim Categorical_{\{c_i-1,\ c_i,\ c_i+1\}}:$ quantized coefficient after modification
+    \item $\hat{C}_i = c_i + \mathcal{E}_i \sim Categorical_{\{c_i-1,\ c_i,\ c_i+1\}}:$ quantized coefficient after modification.
 \end{itemize}
 
 For each coeffcient $c_i$ we sample a realization $\epsilon_i$ of $\mathcal{E}_i$ and obtain the modified version of this coefficient $\hat{c_i}$ which is a realization of $\hat{C_i}$.\\
@@ -109,7 +113,7 @@ The image reconstructed from the original latent representation is called the \t
 \end{figure}
 The insertion rate is given by $H_3(p) = -2p*log_2(p) - (1-2p)log_2(1-2p)$ in bits per coefficient. The size of the message we embbed is given by \[\text{size = number coefficients in latent space * insertion rate}\]
 \subsubsection{Implementation}
-The insertion is done on the quantized coefficients in latent space. Thus, a new model ImageCompressorSteganography based on ImageCompressor contains the necessary steps to perform the insertion given a probability p (see \autoref{fig:probabilities}). The first version of the LSB modification was implemented using 3 for-loops. Due to low performances of python for-loops, a new implementation was done using pytorch's multinomial method, enabling computations to be performed 30 times faster by taking advantage of GPU's computational power.
+The insertion is done on the quantized coefficients in latent space. Thus, a new model \textit{ImageCompressorSteganography} based on ImageCompressor contains the necessary steps to perform the insertion given a probability p (see \autoref{fig:probabilities}). The first version of the LSB modification was implemented using 3 for-loops. Due to low performances of python for-loops, a new implementation was done using pytorch's multinomial method, enabling computations to be performed 30 times faster by taking advantage of GPU's computational power.
 
 \subsection{Side information: quantization error}
 The LSB modification is a very basic approach to perform steganography. Its simplicity makes it easy to detect. Every coeffcient in the latent representation has the same probability of modifications. To make it less detectable, we can use the quantization error: the difference between original coefficients and quantized coefficients in latent space. The goal is to give higher probability of modification where the quantization error is important and smaller probabilities where the quantization error is close to zero.  
@@ -119,7 +123,7 @@ To obtain different probabilities of modification for each coefficient, an optim
 \begin{table}[H]
 \begin{tabular}{ |c|c|c| }
     \hline
-    &  & Comments\\
+    & Mathematical notations & Comments\\
     \hline
     & $e_i = \text{coef}_i - \text{quantized\_coef}_i$ & quantization error on the i-th coefficient\\ 
     & $c_{i,-1} = 1 + 2e_i$ & cost of -1 modification\\ 
@@ -130,13 +134,13 @@ To obtain different probabilities of modification for each coefficient, an optim
     \hline
     Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
     \hline
-    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distortion to minimize \\ 
+    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
     \hline
 \end{tabular}
 \caption[Side information]{Optimization problem to solve}
 \end{table}
 
-This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Patrick Bas. This code only works with 1-D numpy arrays.
+This problem is solved using an iterative algorithm. The code for this algorithm was kindly provided by Mr. P. Bas and Mr. J. Butora. It is available \href{https://janbutora.github.io/downloads/}{\textcolor{blue}{here}} (embedding\_simulator.py). This code only works with 1-D numpy arrays.
 
 \subsubsection{Implementation}
 Since the code for solving the optimization problem is given, we only needed to get the elements to run it: 1D numpy arrays of the costs of +1 and -1 modifications.
@@ -170,7 +174,7 @@ The third method is similar to the second one. The only difference is how the co
 \begin{table}[H]
 \begin{tabular}{ |c|c|c| }
     \hline
-    &  & Comments\\
+    & Mathematical notations & Comments\\
     \hline
     & $e_i = \text{coef}_i - \text{quantized\_coef}_i$ & quantization error on the i-th coefficient\\ 
     & $\textcolor{red}{c_{i,-1} = 1 + e_i}$ & cost of -1 modification\\ 
@@ -181,7 +185,7 @@ The third method is similar to the second one. The only difference is how the co
     \hline
     Constraint & $\displaystyle\sum_{i=1}^{\# coefs}{H_3(p_{i,-1},p_{i,0},p_{i,1})} = M$ & M: size of the message to insert in bits\\
     \hline
-    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distortion to minimize \\ 
+    Objective & $\displaystyle\sum_{i=1}^{\# coefs}{\sum_{k=-1}^{1}{p_{i,k}c_{i,k}}}$ & distorsion to minimize \\ 
     \hline
 \end{tabular}
 \caption[Side information variant]{Variant of the optimization problem}
@@ -191,7 +195,7 @@ The third method is similar to the second one. The only difference is how the co
 \subsection{JIN SRNet}
 JIN SRNet is a deep convolutional neural network whose purpose is to detect if steganography was performed on an image \autocite{liuLosslessImageSteganography2022}. It is pretrained on ImageNet database \autocite{butoraRevisitingPerturbedQuantization2021}. This model can be fine tuned to assess the performances of naive insertion and side information methods. A first idea to compare the 2 methods was to compare the prediction error of JINSRNet on two stego datasets generated with the two methods for the same payload. A second idea is to generate 2 stego datasets with different payloads for each method such that the prediction error is the same. 
 \subsubsection{Generating cover and stego datasets}
-To fine-tune the JINSRNet model, the first step is to generate cover and stego datasets. The original dataset used is BossBase. A dataset of 10 000 grayscaled images saved in pgm format. 
+To fine-tune the JINSRNet model, the first step is to generate cover and stego datasets. The original dataset used is BossBase 1.01 which can be downloaded \href{https://dde.binghamton.edu/download/}{\textcolor{blue}{here}}. A dataset of 10 000 grayscaled images saved in pgm format. 
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{img/bossbase.png}
@@ -202,13 +206,13 @@ To fine-tune the JINSRNet model, the first step is to generate cover and stego d
 The cover dataset is generated by feeding the 10 000 images from BossBase to ImageCompressor, the images are saved as .pt (pytorch tensors). For stego datasets, several were generated for each method. One dataset is generated per payload and method used. Taking into consideration that Bossbase, cover and one stego dataset take 90GB of space on disk, it was not possible to store many versions of stego datasets at once. Thus, every time a new stego dataset was generated, the previous one was removed to save some space.\\
 For every method, the generation of the stego dataset is similar. The only difference is which variant of ImageCompressor model is used. The steps are the following:
 \begin{itemize}
-    \item read pgm files (original images from BossBase)
-    \item convert each file into a tensor as ImageCompressor-based models works with tensors
-    \item feed the tensor image to the ImageCompressor-based model corresponding to the method we want to use with the correct payload (ImageCompressorSteganography for LSB, ImageCompressorSteganography\_QE for side information and ImageCompressorSteganography\_QE\_modified\_cost for the variant of side information)
-    \item save the generated image as a tensor on the disk
+    \item Read .pgm files (original images from BossBase).
+    \item Convert each file into a tensor as \textit{ImageCompressor}-based models works with tensors.
+    \item Feed the tensor image to the \textit{ImageCompressor}-based model corresponding to the method we want to use with the correct payload (\textit{ImageCompressorSteganography} for LSB, \textit{ImageCompressorSteganography\_QE} for side information and \textit{ImageCompressorSteganography\_QE\_modified\_cost} for the variant of side information).
+    \item Save the generated image as a tensor on the disk.
 \end{itemize}
 
-As ImageCompressor-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of pgm images was duplicated on three channels \autocite{butoraStatisticalModelsImage2017} in order to feed them to each model.\\
+As \textit{ImageCompressor}-based models were designed to work on RGB images, it takes as input tensors with three color channels. Thus the grayscale channel of .pgm images was duplicated on three channels \autocite{butoraStatisticalModelsImage2017} in order to feed them to each model.\\
 Two options were available for saving images on the disk:
 \begin{enumerate}
     \item Save the latent representation as .pt
@@ -224,7 +228,7 @@ Option 1 was implemented first, but due to some unknown reason, the tensor saved
 
 \subsubsection{Fine-tuning the pretrained model}
 Once the datasets are generated. We can fine-tune JINSRNet.
-Training script and pretrained model were kindly provided by Jan Butora. Some adjustment were needed in order to load the training data as the original script loaded jpeg files. The class loading the data is called a retriever. We implemented a retriever that works with .pt files (pytorch tensors). The images saved as pytorch tensors are loaded and converted into numpy arrays. To convert pytorch images into numpy images there is two different methods. The first one consists of using the ToPILImage() function of pytorch which converts a pytorch tensor into a PIL image which we can then convert into a numpy array. The second method consists of permuting axis of the tensor to fit numpy convention for representation of images and then converting the tensor into a numpy array by using numpy() function of pytorch Tensor class. As we can see in \autoref{tab:torch2np}, the method of permuting axis and converting to NumPy using numpy() function is about 10 times faster than the other method. Thus this method is the one used for tensor to numpy array conversion.\\
+Training script and pretrained model were kindly provided by Mr. J. Butora. Some adjustment were needed in order to load the training data as the original script loaded jpeg files. The class loading the data is called a retriever. We implemented a retriever that works with .pt files (pytorch tensors). The images saved as pytorch tensors are loaded and converted into numpy arrays. To convert pytorch images into numpy images there is two different methods. The first one consists of using the \textit{ToPILImage()} function of pytorch which converts a pytorch tensor into a PIL image which we can then convert into a numpy array. The second method consists of permuting axis of the tensor to fit numpy convention for representation of images and then converting the tensor into a numpy array by using \textit{numpy()} function of pytorch Tensor class. As we can see in \autoref{tab:torch2np}, the method of permuting axis and converting to NumPy using \textit{numpy()} function is about 10 times faster than the other method. Thus this method is the one used for tensor to numpy array conversion.\\
 
 \begin{lstlisting}[caption={Conversion of pytorch tensors into numpy images}, label={lst:example}]
 to_pil = ToPILImage()
@@ -300,8 +304,11 @@ Side information-based methods were able to embed far more information before be
 \end{figure}
 These three curves were obtained using the same version of JINSRNet (checkpoint from the 0.003 bpc training). As we can see, we could obtain similar prediction errors for the three methods. We observe that side information allows an embedding rate approximately 60 times higher than LSB method.
 
+\clearpage
 \section{Conclusion}
-This project has been a first look on steganography performed on images compressed by AI. Embedding information in the latent representation of images obtained through encoder network was not studied before and we obtained baseline results for different methods: LSB replacement, side information and its variant. There are many perspectives for this project. A comparison with JPEG steganography  would help to see the benefits and inconvenients of steganography on AI-compressed images. During this project, steganography was only performed on grayscale images as we used BossBase dataset. We could work on RGB images as the autoencoder used for image compression works with RGB images. Finally, to obtain better results, running tests for the different methods instead of just using the prediction error on the validation set would have been better but it has not been done due to a lack of time.
+This project has been a first look on steganography performed on images compressed by AI. Embedding information in the latent representation of images obtained through encoder network was not studied before and we obtained baseline results for different methods: LSB replacement, side information and its variant.\\
+There are many perspectives for this project. A comparison with JPEG steganography  would help to see the benefits and inconvenients of steganography on AI-compressed images. During this project, steganography was only performed on grayscale images as we used BossBase dataset. We could work on RGB images as the autoencoder used for image compression works with RGB images. Finally, to obtain better results, running tests for the different methods instead of just using the prediction error on the validation set would have been better but it has not been done due to the lack of time.
 
+\clearpage
 \printbibliography
 \end{document}
