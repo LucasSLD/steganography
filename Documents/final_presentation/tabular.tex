@@ -1,0 +1,40 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{stmaryrd} %for special brackets
+\usepackage{lipsum}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{array}
+\usepackage{bm} %for bold in math equations
+\usepackage{float} %to force the position of some figures
+\usepackage{biblatex}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage[ruled, lined, linesnumbered, commentsnumbered, longend]{algorithm2e}
+\usepackage{biblatex}
+\usepackage{geometry}
+
+
+\begin{document}
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|c|p{2cm}|p{2cm}|}
+    \hline
+    Dataset & \# of features from author & \# of features from recipient & Language & \parbox{3cm}{Interpretability} & \# of additional variables & Average length of the text \\
+    \hline
+    Dataset 1 & 5 & 3 & English & High & 2 & 150 \\
+    \hline
+    Dataset 2 & 7 & 4 & English & Medium & 1 & 200 \\
+    \hline
+    Dataset 3 & 4 & 2 & French & Low & 3 & 100 \\
+    \hline
+    % Add more rows as needed
+    \end{tabular}
+    \caption{Table caption goes here.}
+    \label{tab:mytable}
+\end{table}
+\end{document}
